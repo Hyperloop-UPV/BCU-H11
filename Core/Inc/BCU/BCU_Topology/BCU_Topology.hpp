@@ -114,23 +114,23 @@ namespace BCU {
         // Ethernet (conditional)
         #ifdef STLIB_ETH
         #if defined(USE_PHY_LAN8742)
-        constexpr auto eth = EthernetDomain::Ethernet(
-            EthernetDomain::PINSET_H10,
+        constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
+            ST_LIB::EthernetDomain::PINSET_H10,
             "05:80:e8:55:61:09",
             "192.168.1.5",
             "255.255.0.0"
         );
         #elif defined(USE_PHY_LAN8700)
         #if MASK_TO_24 == 1
-        constexpr auto eth = EthernetDomain::Ethernet(
-            EthernetDomain::PINSET_H10,
+        constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
+            ST_LIB::EthernetDomain::PINSET_H10,
             "05:80:e8:55:61:09",
             "192.168.1.5",
             "255.255.255.0"
         );
         #else
-        constexpr auto eth = EthernetDomain::Ethernet(
-            EthernetDomain::PINSET_H10,
+        constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
+            ST_LIB::EthernetDomain::PINSET_H10,
             "05:80:e8:55:61:09",
             "192.168.1.5",
             "255.255.0.0"
@@ -138,15 +138,15 @@ namespace BCU {
         #endif
         #elif defined(USE_PHY_KSZ8041)
         #if MASK_TO_24 == 1
-        constexpr auto eth = EthernetDomain::Ethernet(
-            EthernetDomain::PINSET_H11,
+        constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
+            ST_LIB::EthernetDomain::PINSET_H11,
             "05:80:e8:55:61:09",
             "192.168.1.5",
             "255.255.255.0"
         );
         #else
-        constexpr auto eth = EthernetDomain::Ethernet(
-            EthernetDomain::PINSET_H11,
+        constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
+            ST_LIB::EthernetDomain::PINSET_H11,
             "05:80:e8:55:61:09",
             "192.168.1.5",
             "255.255.0.0"
@@ -158,7 +158,11 @@ namespace BCU {
         #endif
 
         // Main board register
-    using Board = ST_LIB::Board<kMotorPhaseR_P, kMotorPhaseR_N, kMotorPhaseS_P, kMotorPhaseS_N, kMotorPhaseT_P, kMotorPhaseT_N,
+    using Board = ST_LIB::Board< 
+    #ifdef STLIB_ETH
+        eth,
+    #endif
+        kMotorPhaseR_P, kMotorPhaseR_N, kMotorPhaseS_P, kMotorPhaseS_N, kMotorPhaseT_P, kMotorPhaseT_N,
         kPPUReady_B, kPPUFault_B, kPPUReady_A, kPPUFault_A, kBuffer_Enable,
         kLED_Operational, kLED_Fault, kLED_Connecting, kLED_Can, kLED_Accelerating, kLED_Braking,
         kHall_Supply_A, kHall_Supply_B,
@@ -169,9 +173,6 @@ namespace BCU {
         kTempSensorA, kTempSensorB,
         kVoltageSensorA, kVoltageSensorB,
         kmotor_timer,ktimer_speetec1, ktimer_speetec2
-        #ifdef STLIB_ETH
-        , eth
-        #endif
         >;
     } // namespace BCU_Topology
 
