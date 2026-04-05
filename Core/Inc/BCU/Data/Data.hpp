@@ -3,6 +3,9 @@
 #include "ST-LIB.hpp"
 
 namespace BCU {
+namespace Configuration{
+    inline constexpr int deadTime_ns = 300;
+}
 namespace Pinout {
 //PWM R
 inline constexpr auto& kPWM_R_P = ST_LIB::PE9;
@@ -82,4 +85,25 @@ inline constexpr auto& kVoltageSensorA = ST_LIB::PF3;
 inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 
 } // namespace Pinout
+
+namespace Types {
+      //OUTPUT LOGIC (Normally Open or Normally Closed)
+        enum OLogic{
+            N_OPEN,
+            N_CLOSE,
+        };
+
+    enum MotorState {
+        Inactive,
+        Active
+    };
+    struct MotorData{
+        int frequency;
+        int duty_cycle_R;
+        int duty_cycle_S;
+        int duty_cycle_T;
+        MotorState state;
+    };
+}
+
 } // namespace BCU
