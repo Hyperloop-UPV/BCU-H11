@@ -23,9 +23,11 @@ namespace Configuration{
 
     inline constexpr SensorConfig::Config voltageSense_A{1.0f, 0.0f};
     inline constexpr SensorConfig::Config voltageSense_B{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,2> voltageSense{voltageSense_A,voltageSense_B};
 
     inline constexpr SensorConfig::Config tempSense_A{1.0f, 0.0f};
     inline constexpr SensorConfig::Config tempSense_B{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,2> tempSense{tempSense_A,tempSense_B};
 }
 namespace Pinout {
 //PWM R
@@ -145,12 +147,6 @@ namespace Types {
         };
         float sensor_data[2]; 
         }; 
-    };
-    struct Encoder_Data{
-        double position;
-        double speed;
-        double acceleration;
-        ST_LIB::Direction direction;
     };
 }
 
