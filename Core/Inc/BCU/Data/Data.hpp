@@ -1,10 +1,31 @@
 #pragma once
 #include "BCU/Config/Config.hpp"
+#include "BCU/Sensor/Sensor.hpp"
 #include "ST-LIB.hpp"
 
+
 namespace BCU {
+
 namespace Configuration{
     inline constexpr int deadTime_ns = 300;
+    inline constexpr int switchingFrequency_Hz = 1000;
+
+    inline constexpr SensorConfig::Config currentSense_R_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_S_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_T_A{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,3> currentSense_A{currentSense_R_A,currentSense_S_A,currentSense_T_A};
+
+
+    inline constexpr SensorConfig::Config currentSense_R_B{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_S_B{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_T_B{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,3> currentSense_B{currentSense_R_B,currentSense_S_B,currentSense_T_B};
+
+    inline constexpr SensorConfig::Config voltageSense_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config voltageSense_B{1.0f, 0.0f};
+
+    inline constexpr SensorConfig::Config tempSense_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config tempSense_B{1.0f, 0.0f};
 }
 namespace Pinout {
 //PWM R
@@ -93,17 +114,39 @@ namespace Types {
             N_CLOSE,
         };
 
-    enum MotorState {
-        Inactive,
-        Active
+    
+
+    struct CurrentSense_Data{
+        union{
+        struct{
+            float current_R;
+            float current_S;
+            float current_T;
+        };
+        float sensor_data[3];
+        };
+        
     };
-    struct MotorData{
-        int frequency;
-        int duty_cycle_R;
-        int duty_cycle_S;
-        int duty_cycle_T;
-        MotorState state;
+    struct VoltageSense_Data{
+        union{
+        struct{
+            float voltage_A;
+            float voltage_B;
+        };
+        float sensor_data[2];
     };
+        
+    };
+    struct TempSense_Data{
+        union{
+        struct{
+        float temp_A;
+        float temp_B; 
+        };
+        float sensor_data[2]; 
+        }; 
+    };
+    
 }
 
 } // namespace BCU
