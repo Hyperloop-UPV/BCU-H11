@@ -73,7 +73,7 @@ namespace BCU {
         inline constexpr auto kCurrentSenseT_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_T_B,ST_LIB::ADCDomain::Resolution::BITS_16);
 
         // Speedtec
-        inline constexpr auto kSpeedtecSupply = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
+        inline constexpr auto kSpeetecSupply = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
 
         inline constexpr auto kSpeedtec1_Input1 = ST_LIB::TimerPin{
             .af = ST_LIB::TimerAF::Encoder,
@@ -165,26 +165,32 @@ namespace BCU {
         Topology::kLED_Operational, Topology::kLED_Fault, Topology::kLED_Connecting, Topology::kLED_Can, Topology::kLED_Accelerating, Topology::kLED_Braking,
         Topology::kHall_Supply_A, Topology::kHall_Supply_B,
         Topology::kCurrentSenseR_A, Topology::kCurrentSenseR_B, Topology::kCurrentSenseS_A, Topology::kCurrentSenseS_B, Topology::kCurrentSenseT_A, Topology::kCurrentSenseT_B,
-        Topology::kSpeedtecSupply,
+        Topology::kSpeetecSupply,
         Topology::kTempSensorA, Topology::kTempSensorB,
         Topology::kVoltageSensorA, Topology::kVoltageSensorB,
         Topology::kmotor_timer,Topology::ktimer_speetec1, Topology::ktimer_speetec2
         >;
     namespace Types{
+        //Motor 
         using MotorTimer = ST_LIB::TimerWrapper<Topology::kmotor_timer>;
         using PhaseR = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseR_P, Topology::kMotorPhaseR_N>());
         using PhaseS = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseS_P, Topology::kMotorPhaseS_N>());
         using PhaseT = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseT_P, Topology::kMotorPhaseT_N>());
         using BufferEnable = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_CLOSE, Topology::kBufferEnable>());
+        
+        //Current Sensor
         using HallSupply_A = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_A>());
         using HallSupply_B = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_B>());
 
-        using CurrentSenseA = Sensor<BCU::Board,BCU::Types::CurrentSense_Data,BCU::Types::HallSupply_A,BCU::Configuration::currentSense_A,
-                                BCU::Topology::kCurrentSenseR_A,BCU::Topology::kCurrentSenseS_A,BCU::Topology::kCurrentSenseT_A>;
-        using CurrentSenseB = Sensor<BCU::Board,BCU::Types::CurrentSense_Data,BCU::Types::HallSupply_B,BCU::Configuration::currentSense_B,
-                                BCU::Topology::kCurrentSenseR_B,BCU::Topology::kCurrentSenseS_B,BCU::Topology::kCurrentSenseT_B>;
+        using CurrentSenseA = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_A,Configuration::currentSense_A,
+                                Topology::kCurrentSenseR_A,BCU::Topology::kCurrentSenseS_A,Topology::kCurrentSenseT_A>;
+        using CurrentSenseB = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_B,Configuration::currentSense_B,
+                                Topology::kCurrentSenseR_B,Topology::kCurrentSenseS_B,Topology::kCurrentSenseT_B>;
 
-        //Sensors
+        //Encoder 
+        using SpeetecSupply = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kSpeetecSupply>());
+        using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
+
     }
     
 
