@@ -125,7 +125,7 @@ namespace Types {
             float current_S;
             float current_T;
         };
-        float sensor_data[3];
+        float raw[3];
         };
         
     };
@@ -135,7 +135,7 @@ namespace Types {
             float voltage_A;
             float voltage_B;
         };
-        float sensor_data[2];
+        float raw[2];
     };
         
     };
@@ -145,9 +145,17 @@ namespace Types {
         float temp_A;
         float temp_B; 
         };
-        float sensor_data[2]; 
+        float raw[2]; 
         }; 
     };
-}
-
+    struct Inverter_Data{
+        union{
+            struct{
+                GPIO_PinState Ready;
+                GPIO_PinState Fault;
+            };
+            GPIO_PinState raw[2];
+        };
+    };
+};
 } // namespace BCU
