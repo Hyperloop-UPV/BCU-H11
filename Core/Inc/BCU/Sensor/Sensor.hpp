@@ -1,83 +1,88 @@
 #pragma once
 #include "ST-LIB.hpp"
 #include "BCU/Traits/Traits.hpp"
-/*
-Data has to provide:
-struct Data{
-    float sensor_data[N];
-};
-N == Number of sensors declared.
-the union is need to allow iterate easily over the sensor data
 
-The order of the types must be the same as the order in Data.
-*/
-
-namespace SensorConfig{
-     struct Config{
-        float Slope;
-        float Offset;
-        consteval Config(float Slope = 1.0,float Offset = 0.0):
-        Slope(Slope),Offset(Offset)
-        {}
+namespace SensorConfig {
+    struct Config {
+        float slope;
+        float offset;
+        consteval Config(float slope = 1.0, float offset = 0.0) :
+            slope(slope), offset(offset) {}
     };
 }
-//In case of No power_supply, DO_Supply = No_Supply
-template <typename Board,typename Data,typename DO_Supply,const auto& config,auto&... adcs>
-class Sensor{
-    using ConfigType = std::decay_t<decltype(config)>; // Decay limpia las referencias.
+
+template <typename Board, typename Data, typename DOSupply, const auto& kConfig, auto&... adcs>
+class Sensor {
+public:
+    using ConfigType = std::decay_t<decltype(kConfig)>;
     static constexpr std::size_t kNumberSensors = sizeof...(adcs);
+
     static_assert(kNumberSensors > 0, "Must be at least one Sensor");
-    static_assert(std::is_convertible_v<ConfigType,std::array<SensorConfig::Config,kNumberSensors>>, "Must be convertible to std::array<SensorConfig::Config,NumberSensors>");
     static_assert(
-        std::extent_v<decltype(std::declval<Data>().sensor_data)> == kNumberSensors,
-    "Data needs to have an array sensor_data with the same size as the number of sensors"
+        std::is_convertible_v<ConfigType, std::array<SensorConfig::Config, kNumberSensors>>, 
+        "kConfig must be convertible to std::array<SensorConfig::Config, kNumberSensors>"
     );
-    private:
-    Data data_{};
-    std::array<LinearSensor<float>,kNumberSensors> sensors_;
-    DO_Supply supply_{};
-    template<std::size_t... Is>
-    Sensor(std::index_sequence<Is...>):
-        sensors_{LinearSensor<float>(Board::template instance_of<adcs>(),config[Is].Slope,config[Is].Offset,data_.sensor_data[Is])...}
-    {} 
+    
+    static_assert(
+        requires(Data d) { d.sensor_data; } &&
+        std::extent_v<decltype(std::declval<Data>().sensor_data)> == kNumberSensors,
+        "Data needs to have an array 'sensor_data' with the same size as the number of sensors"
+    );
 
-    template<auto& TargetADC>
-    static constexpr std::size_t get_index(){
-        std::size_t index = 0;
-        bool found = ((&TargetADC == &adcs ? true : (++index,false)) || ...);
-        if(!found){
-            return kNumberSensors;
-        }
-        return index;
-    }
-    public:
-    Sensor(): 
-    Sensor(std::make_index_sequence<kNumberSensors>{}){}
+    Sensor() : 
+        Sensor(std::make_index_sequence<kNumberSensors>{}) {}
 
-    const Data& subscribe(){
+    const Data& subscribe() const {
         return data_;
     }
-    template<auto& TargetADC>
-    void set_offset(float offset){
+
+    template <auto& TargetADC>
+    void set_offset(float offset) {
         constexpr std::size_t index = get_index<TargetADC>();
-        static_assert(index < kNumberSensors,"The ADC is not part of this class sensor");
+        static_assert(index < kNumberSensors, "The ADC is not part of this class sensor");
         sensors_[index].set_offset(offset);
     }
-    template<auto& TargetADC>
-    void set_slope(float slope){
+
+    template <auto& TargetADC>
+    void set_slope(float slope) {
         constexpr std::size_t index = get_index<TargetADC>();
-        static_assert(index < kNumberSensors,"The ADC is not part of this class sensor");
+        static_assert(index < kNumberSensors, "The ADC is not part of this class sensor");
         sensors_[index].set_gain(slope);
     }
-    void read(){
-        for(auto& sensor : sensors_){
+
+    void read() {
+        for (auto& sensor : sensors_) {
             sensor.read();
         }
     }
-    void turn_on(){
+
+    void turn_on() {
         supply_.turn_on();
     }
-    void turn_off(){
+
+    void turn_off() {
         supply_.turn_off();
+    }
+
+private:
+
+    Data data_{};
+    std::array<LinearSensor<float>, kNumberSensors> sensors_;
+    DOSupply supply_{};
+
+    template <std::size_t... Is>
+    explicit Sensor(std::index_sequence<Is...>) :
+        sensors_{LinearSensor<float>(
+            Board::template instance_of<adcs>(), 
+            kConfig[Is].slope, 
+            kConfig[Is].offset, 
+            data_.sensor_data[Is])...} 
+    {} 
+
+    template <auto& TargetADC>
+    static constexpr std::size_t get_index() {
+        std::size_t index = 0;
+        bool found = ((&TargetADC == &adcs ? true : (++index, false)) || ...);
+        return found ? index : kNumberSensors;
     }
 };
