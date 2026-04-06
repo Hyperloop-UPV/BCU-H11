@@ -1,6 +1,6 @@
 #pragma once
 #include "ST-LIB.hpp"
-namespace Drivers{
+namespace Devices{
     //  Trait for extracting timer reference from MotorTimer type 
     template<typename T> struct TimerTraits;
 
@@ -19,9 +19,9 @@ namespace Drivers{
         static constexpr const ST_LIB::TimerPin& pin_n = N;
     };
 
-    struct No_Supply{
+    struct NoSupply{
             void turn_on(){}
             void turn_off(){}
-            No_Supply(){}
+            NoSupply(){}
     };
 }
