@@ -24,12 +24,12 @@ public:
     );
     
     static_assert(
-        requires(Data d) { d.sensor_data; } &&
-        std::extent_v<decltype(std::declval<Data>().sensor_data)> == kNumberSensors,
-        "Data needs to have an array 'sensor_data' with the same size as the number of sensors"
+        requires(Data d) { d.raw; } &&
+        std::extent_v<decltype(std::declval<Data>().raw)> == kNumberSensors,
+        "Data needs to have an array 'raw' with the same size as the number of sensors"
     );
 
-    Sensor() : 
+    explicit Sensor() : 
         Sensor(std::make_index_sequence<kNumberSensors>{}) {}
 
     const Data& subscribe() const {
@@ -68,7 +68,7 @@ private:
 
     static inline Data data_{};
     std::array<LinearSensor<float>, kNumberSensors> sensors_;
-    DOSupply supply_{};
+    [[no_unique_address]]DOSupply supply_{};
 
     template <std::size_t... Is>
     explicit Sensor(std::index_sequence<Is...>) :
@@ -76,7 +76,7 @@ private:
             Board::template instance_of<adcs>(), 
             kConfig[Is].slope, 
             kConfig[Is].offset, 
-            data_.sensor_data[Is])...} 
+            data_.raw[Is])...} 
     {} 
 
     template <auto& TargetADC>

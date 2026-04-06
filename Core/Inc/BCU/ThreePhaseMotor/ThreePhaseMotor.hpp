@@ -87,7 +87,7 @@ private:
     static constexpr auto& kpinT_P = PhaseTraits<PhaseT>::pin_p;
     static constexpr auto& kpinT_N = PhaseTraits<PhaseT>::pin_n;
 
-    BufferEnable buffer_enable_{};
+    [[no_unique_address]] BufferEnable buffer_enable_{};
     static inline Data data_{};
     MotorTimer motor_timer_;
     PhaseR phase_r_;
