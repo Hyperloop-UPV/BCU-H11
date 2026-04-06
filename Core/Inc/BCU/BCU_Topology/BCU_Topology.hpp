@@ -65,12 +65,12 @@ namespace BCU {
         inline constexpr auto kHall_Supply_B = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kHall_Supply_B);
 
         //Hall Sensors
-        inline constexpr auto kCurrentSenseR_A = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_R_A);
-        inline constexpr auto kCurrentSenseR_B = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_R_B);
-        inline constexpr auto kCurrentSenseS_A = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_S_A);
-        inline constexpr auto kCurrentSenseS_B = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_S_B);
-        inline constexpr auto kCurrentSenseT_A = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_T_A);
-        inline constexpr auto kCurrentSenseT_B = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kCurrentSense_T_B);
+        inline constexpr auto kCurrentSenseR_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_R_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseR_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_R_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseS_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_S_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseS_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_S_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseT_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_T_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseT_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_T_B,ST_LIB::ADCDomain::Resolution::BITS_16);
 
         // Speedtec
         inline constexpr auto kSpeedtecSupply = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
@@ -98,7 +98,7 @@ namespace BCU {
 
         inline constexpr auto ktimer_speetec1 = ST_LIB::TimerDomain::Timer(
             {.request = Pinout::ktimer_speetec1},
-             kSpeedtec1_Input1, kSpeedtec1_Input2); //Shared timer between speetec 1 and 3
+             kSpeedtec1_Input1, kSpeedtec1_Input2);
         
              inline constexpr auto ktimer_speetec2 = ST_LIB::TimerDomain::Timer(
             {.request = Pinout::ktimer_speetec2},
@@ -176,6 +176,15 @@ namespace BCU {
         using PhaseS = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseS_P, Topology::kMotorPhaseS_N>());
         using PhaseT = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseT_P, Topology::kMotorPhaseT_N>());
         using BufferEnable = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_CLOSE, Topology::kBufferEnable>());
+        using HallSupply_A = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_A>());
+        using HallSupply_B = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_B>());
+
+        using CurrentSenseA = Sensor<BCU::Board,BCU::Types::CurrentSense_Data,BCU::Types::HallSupply_A,BCU::Configuration::currentSense_A,
+                                BCU::Topology::kCurrentSenseR_A,BCU::Topology::kCurrentSenseS_A,BCU::Topology::kCurrentSenseT_A>;
+        using CurrentSenseB = Sensor<BCU::Board,BCU::Types::CurrentSense_Data,BCU::Types::HallSupply_B,BCU::Configuration::currentSense_B,
+                                BCU::Topology::kCurrentSenseR_B,BCU::Topology::kCurrentSenseS_B,BCU::Topology::kCurrentSenseT_B>;
+
+        //Sensors
     }
     
 
