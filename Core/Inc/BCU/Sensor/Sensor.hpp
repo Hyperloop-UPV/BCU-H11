@@ -1,5 +1,6 @@
 #pragma once
 #include "ST-LIB.hpp"
+#include "BCU/Traits/Traits.hpp"
 /*
 Data has to provide:
 struct Data{
@@ -18,11 +19,6 @@ namespace SensorConfig{
         consteval Config(float Slope = 1.0,float Offset = 0.0):
         Slope(Slope),Offset(Offset)
         {}
-    };
-    struct No_Supply{
-        void turn_on(){}
-        void turn_off(){}
-        No_Supply(){}
     };
 }
 //In case of No power_supply, DO_Supply = No_Supply
@@ -77,5 +73,11 @@ class Sensor{
         for(auto& sensor : sensors){
             sensor.read();
         }
+    }
+    void turn_on(){
+        supply.turn_on();
+    }
+    void turn_off(){
+        supply.turn_off();
     }
 };
