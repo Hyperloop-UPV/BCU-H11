@@ -1,14 +1,24 @@
 #pragma once
-
-#include "../BCU_Topology/BCU_Topology.hpp"
 #include "../Traits/Traits.hpp"
 #include "ST-LIB.hpp"
 
-template<typename Board,typename MotorTimer,typename PhaseR, typename PhaseS, typename PhaseT,typename BufferEnable,typename MotorData,auto ActiveState, auto InactiveState>
+template<typename Board,typename MotorTimer,typename PhaseR, typename PhaseS, typename PhaseT,typename BufferEnable>
 class Motor{
+    public: 
+        enum State {
+            Inactive,
+            Active
+        };
+        struct Data{
+            int frequency;
+            int duty_cycle_R;
+            int duty_cycle_S;
+            int duty_cycle_T;
+            State state;
+        };
     private:
     BufferEnable buffer_enable{};
-    static inline MotorData data{};
+    static inline Data data{};
     MotorTimer Motor_timer;
     PhaseR phase_r;
     PhaseS phase_s;
@@ -36,7 +46,7 @@ class Motor{
     {
         set_dead_time(deadtime_ns);
     }
-    const MotorData& subscribe(){
+    const Data& subscribe(){
         return data;
     }
     template<typename T>
@@ -72,11 +82,11 @@ class Motor{
     }
     inline void turn_on(){
         buffer_enable.turn_on();
-        data.state = ActiveState;
+        data.state = State::Active;
     }
     inline void turn_off(){
         buffer_enable.turn_off();
         set_duty_cycle(0.0f, 0.0f, 0.0f);
-        data.state = InactiveState;
+        data.state = State::Inactive;
     }
 };
