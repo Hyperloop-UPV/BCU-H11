@@ -25,16 +25,16 @@ namespace SensorConfig{
 template <typename Board,typename Data,typename DO_Supply,const auto& config,auto&... adcs>
 class Sensor{
     using ConfigType = std::decay_t<decltype(config)>; // Decay limpia las referencias.
-    static constexpr std::size_t NumberSensors = sizeof...(adcs);
-    static_assert(NumberSensors > 0, "Must be at least one Sensor");
-    static_assert(std::is_convertible_v<ConfigType,std::array<SensorConfig::Config,NumberSensors>>, "Must be convertible to std::array<SensorConfig::Config,NumberSensors>");
+    static constexpr std::size_t kNumberSensors = sizeof...(adcs);
+    static_assert(kNumberSensors > 0, "Must be at least one Sensor");
+    static_assert(std::is_convertible_v<ConfigType,std::array<SensorConfig::Config,kNumberSensors>>, "Must be convertible to std::array<SensorConfig::Config,NumberSensors>");
     static_assert(
-        std::extent_v<decltype(std::declval<Data>().sensor_data)> == NumberSensors,
+        std::extent_v<decltype(std::declval<Data>().sensor_data)> == kNumberSensors,
     "Data needs to have an array sensor_data with the same size as the number of sensors"
     );
     private:
     Data data_{};
-    std::array<LinearSensor<float>,NumberSensors> sensors_;
+    std::array<LinearSensor<float>,kNumberSensors> sensors_;
     DO_Supply supply_{};
     template<std::size_t... Is>
     Sensor(std::index_sequence<Is...>):
@@ -46,13 +46,13 @@ class Sensor{
         std::size_t index = 0;
         bool found = ((&TargetADC == &adcs ? true : (++index,false)) || ...);
         if(!found){
-            return NumberSensors;
+            return kNumberSensors;
         }
         return index;
     }
     public:
     Sensor(): 
-    Sensor(std::make_index_sequence<NumberSensors>{}){}
+    Sensor(std::make_index_sequence<kNumberSensors>{}){}
 
     const Data& subscribe(){
         return data_;
@@ -60,13 +60,13 @@ class Sensor{
     template<auto& TargetADC>
     void set_offset(float offset){
         constexpr std::size_t index = get_index<TargetADC>();
-        static_assert(index < NumberSensors,"The ADC is not part of this class sensor");
+        static_assert(index < kNumberSensors,"The ADC is not part of this class sensor");
         sensors_[index].set_offset(offset);
     }
     template<auto& TargetADC>
     void set_slope(float slope){
         constexpr std::size_t index = get_index<TargetADC>();
-        static_assert(index < NumberSensors,"The ADC is not part of this class sensor");
+        static_assert(index < kNumberSensors,"The ADC is not part of this class sensor");
         sensors_[index].set_gain(slope);
     }
     void read(){
