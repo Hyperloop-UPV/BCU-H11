@@ -29,16 +29,16 @@ class Sensor{
     static_assert(NumberSensors > 0, "Must be at least one Sensor");
     static_assert(std::is_convertible_v<ConfigType,std::array<SensorConfig::Config,NumberSensors>>, "Must be convertible to std::array<SensorConfig::Config,NumberSensors>");
     static_assert(
-        std::extent_v<decltype(Data{}.sensor_data)> == NumberSensors,
+        std::extent_v<decltype(std::declval<Data>().sensor_data)> == NumberSensors,
     "Data needs to have an array sensor_data with the same size as the number of sensors"
     );
     private:
-    Data data{};
-    std::array<LinearSensor<float>,NumberSensors> sensors;
-    DO_Supply supply{};
+    Data data_{};
+    std::array<LinearSensor<float>,NumberSensors> sensors_;
+    DO_Supply supply_{};
     template<std::size_t... Is>
     Sensor(std::index_sequence<Is...>):
-        sensors{LinearSensor<float>(Board::template instance_of<adcs>(),config[Is].Slope,config[Is].Offset,data.sensor_data[Is])...}
+        sensors_{LinearSensor<float>(Board::template instance_of<adcs>(),config[Is].Slope,config[Is].Offset,data_.sensor_data[Is])...}
     {} 
 
     template<auto& TargetADC>
@@ -55,29 +55,29 @@ class Sensor{
     Sensor(std::make_index_sequence<NumberSensors>{}){}
 
     const Data& subscribe(){
-        return data;
+        return data_;
     }
     template<auto& TargetADC>
     void set_offset(float offset){
         constexpr std::size_t index = get_index<TargetADC>();
         static_assert(index < NumberSensors,"The ADC is not part of this class sensor");
-        sensors[index].set_offset(offset);
+        sensors_[index].set_offset(offset);
     }
     template<auto& TargetADC>
     void set_slope(float slope){
         constexpr std::size_t index = get_index<TargetADC>();
         static_assert(index < NumberSensors,"The ADC is not part of this class sensor");
-        sensors[index].set_gain(slope);
+        sensors_[index].set_gain(slope);
     }
     void read(){
-        for(auto& sensor : sensors){
+        for(auto& sensor : sensors_){
             sensor.read();
         }
     }
     void turn_on(){
-        supply.turn_on();
+        supply_.turn_on();
     }
     void turn_off(){
-        supply.turn_off();
+        supply_.turn_off();
     }
 };
