@@ -3,7 +3,7 @@
 #include "BCU/Data/Data.hpp"
 #include "BCU/Wrappers/Wrappers.hpp"
 #include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
-
+#include "BCU/Inverter_Feedback/Inverter_Feedback.hpp"
 namespace BCU {
     namespace Topology {
         //PWM Objects
@@ -201,6 +201,11 @@ namespace BCU {
         using SpeetecSupply = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kSpeetecSupply>());
         using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
         using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
+
+        //Inverter 
+        using InverterA = Devices::Inverter_Feedback<Board,Types::Inverter_Data,Topology::kPPUReady_A,Topology::kPPUFault_A>;
+        using InverterB = Devices::Inverter_Feedback<Board,Types::Inverter_Data,Topology::kPPUReady_B,Topology::kPPUFault_B>;
+
 
     }
     
