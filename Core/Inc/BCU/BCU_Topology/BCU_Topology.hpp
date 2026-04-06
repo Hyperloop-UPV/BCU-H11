@@ -2,6 +2,7 @@
 #include "ST-LIB.hpp"
 #include "BCU/Data/Data.hpp"
 #include "BCU/Wrappers/Wrappers.hpp"
+#include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
 
 namespace BCU {
     namespace Topology {
@@ -178,6 +179,7 @@ namespace BCU {
         using PhaseT = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseT_P, Topology::kMotorPhaseT_N>());
         using BufferEnable = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_CLOSE, Topology::kBufferEnable>());
         
+        using SynchronousMotor = Devices::ThreePhaseMotor<BCU::Board, BCU::Types::MotorTimer, BCU::Types::PhaseR, BCU::Types::PhaseS, BCU::Types::PhaseT, BCU::Types::BufferEnable>;
         //Current Sensor
         using HallSupply_A = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_A>());
         using HallSupply_B = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_B>());
@@ -187,9 +189,18 @@ namespace BCU {
         using CurrentSenseB = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_B,Configuration::currentSense_B,
                                 Topology::kCurrentSenseR_B,Topology::kCurrentSenseS_B,Topology::kCurrentSenseT_B>;
 
+        //Voltage Sensors
+        using VoltageSense = Sensor<Board,Types::VoltageSense_Data,Devices::NoSupply,Configuration::voltageSense,
+                                Topology::kVoltageSensorA,Topology::kVoltageSensorB>;
+
+        //Temperature Sensor
+        using TempSense = Sensor<Board,Types::TempSense_Data,Devices::NoSupply,Configuration::tempSense,
+                                Topology::kTempSensorA,Topology::kTempSensorB>;
+
         //Encoder 
         using SpeetecSupply = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kSpeetecSupply>());
         using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
+        using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
 
     }
     

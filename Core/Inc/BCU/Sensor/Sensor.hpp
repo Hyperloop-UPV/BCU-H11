@@ -66,7 +66,7 @@ public:
 
 private:
 
-    Data data_{};
+    static inline Data data_{};
     std::array<LinearSensor<float>, kNumberSensors> sensors_;
     DOSupply supply_{};
 

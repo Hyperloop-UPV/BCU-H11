@@ -2,10 +2,10 @@
 #include "../Traits/Traits.hpp"
 #include "ST-LIB.hpp"
 
-namespace Drivers{
+namespace Devices{
 
 template<typename Board, typename MotorTimer, typename PhaseR, typename PhaseS, typename PhaseT, typename BufferEnable>
-class Motor {
+class ThreePhaseMotor {
 public: 
     enum class State : uint8_t {
         Inactive,
@@ -19,7 +19,7 @@ public:
         State state;
     };
 
-    explicit Motor(uint64_t deadtime_ns = 300) :
+    explicit ThreePhaseMotor(uint64_t deadtime_ns = 300) :
         motor_timer_(&Board::template instance_of<ktimer_motor>()),
         phase_r_(motor_timer_.template get_dual_pwm<kpinR_P, kpinR_N>()),
         phase_s_(motor_timer_.template get_dual_pwm<kpinS_P, kpinS_N>()),
