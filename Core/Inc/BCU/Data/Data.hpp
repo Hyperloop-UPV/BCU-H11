@@ -109,7 +109,7 @@ inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 
 namespace Types {
       //OUTPUT LOGIC (Normally Open or Normally Closed)
-        enum OLogic{
+        enum class OLogic: uint8_t{
             N_OPEN,
             N_CLOSE,
         };
@@ -146,7 +146,12 @@ namespace Types {
         float sensor_data[2]; 
         }; 
     };
-    
+    struct Encoder_Data{
+        double position;
+        double speed;
+        double acceleration;
+        ST_LIB::Direction direction;
+    };
 }
 
 } // namespace BCU

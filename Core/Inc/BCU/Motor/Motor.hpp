@@ -2,18 +2,19 @@
 #include "../Traits/Traits.hpp"
 #include "ST-LIB.hpp"
 
+namespace Drivers{
 template<typename Board,typename MotorTimer,typename PhaseR, typename PhaseS, typename PhaseT,typename BufferEnable>
 class Motor{
     public: 
-        enum State {
+        enum class State: uint8_t {
             Inactive,
             Active
         };
         struct Data{
             int frequency;
-            int duty_cycle_R;
-            int duty_cycle_S;
-            int duty_cycle_T;
+            float duty_cycle_R;
+            float duty_cycle_S;
+            float duty_cycle_T;
             State state;
         };
     private:
@@ -90,3 +91,5 @@ class Motor{
         data.state = State::Inactive;
     }
 };
+
+}
