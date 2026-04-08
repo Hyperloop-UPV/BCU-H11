@@ -4,7 +4,7 @@
 
 namespace Devices{
 
-template<typename Board, typename MotorTimer, typename PhaseR, typename PhaseS, typename PhaseT, typename BufferEnable>
+template<typename Board, typename MotorTimer, typename PhaseU, typename PhaseV, typename PhaseW, typename BufferEnable>
 class ThreePhaseMotor {
 public: 
     enum class State : uint8_t {
@@ -13,17 +13,17 @@ public:
     };
     struct Data {
         int frequency;
-        float duty_cycle_r;
-        float duty_cycle_s;
-        float duty_cycle_t;
+        float duty_cycle_u;
+        float duty_cycle_v;
+        float duty_cycle_w;
         State state;
     };
 
     explicit ThreePhaseMotor(uint64_t deadtime_ns = 300) :
         motor_timer_(&Board::template instance_of<ktimer_motor>()),
-        phase_r_(motor_timer_.template get_dual_pwm<kpinR_P, kpinR_N>()),
-        phase_s_(motor_timer_.template get_dual_pwm<kpinS_P, kpinS_N>()),
-        phase_t_(motor_timer_.template get_dual_pwm<kpinT_P, kpinT_N>())
+        phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
+        phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
+        phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>())
     {
         set_dead_time(deadtime_ns);
     }
@@ -32,27 +32,27 @@ public:
 
     template<typename T>
     inline void set_duty_cycle(float duty_cycle) {
-        static_assert(std::is_same_v<T, PhaseR> || std::is_same_v<T, PhaseS> || std::is_same_v<T, PhaseT>, "Invalid phase type");
+        static_assert(std::is_same_v<T, PhaseU> || std::is_same_v<T, PhaseV> || std::is_same_v<T, PhaseW>, "Invalid phase type");
         
-        if constexpr (std::is_same_v<T, PhaseR>) {
-            phase_r_.set_duty_cycle(duty_cycle);
-            data_.duty_cycle_r = phase_r_.get_duty_cycle();
-        } else if constexpr (std::is_same_v<T, PhaseS>) {
-            phase_s_.set_duty_cycle(duty_cycle);
-            data_.duty_cycle_s = phase_s_.get_duty_cycle();
-        } else if constexpr (std::is_same_v<T, PhaseT>) {
-            phase_t_.set_duty_cycle(duty_cycle);
-            data_.duty_cycle_t = phase_t_.get_duty_cycle();
+        if constexpr (std::is_same_v<T, PhaseU>) {
+            phase_u_.set_duty_cycle(duty_cycle);
+            data_.duty_cycle_u = phase_u_.get_duty_cycle();
+        } else if constexpr (std::is_same_v<T, PhaseV>) {
+            phase_v_.set_duty_cycle(duty_cycle);
+            data_.duty_cycle_v = phase_v_.get_duty_cycle();
+        } else if constexpr (std::is_same_v<T, PhaseW>) {
+            phase_w_.set_duty_cycle(duty_cycle);
+            data_.duty_cycle_w = phase_w_.get_duty_cycle();
         }
     }
 
-    inline void set_duty_cycle(float duty_cycle_R, float duty_cycle_S, float duty_cycle_T) {
-        phase_r_.set_duty_cycle(duty_cycle_R);
-        phase_s_.set_duty_cycle(duty_cycle_S);
-        phase_t_.set_duty_cycle(duty_cycle_T);
-        data_.duty_cycle_r = phase_r_.get_duty_cycle();
-        data_.duty_cycle_s = phase_s_.get_duty_cycle();
-        data_.duty_cycle_t = phase_t_.get_duty_cycle();
+    inline void set_duty_cycle(float duty_cycle_U, float duty_cycle_V, float duty_cycle_W) {
+        phase_u_.set_duty_cycle(duty_cycle_U);
+        phase_v_.set_duty_cycle(duty_cycle_V);
+        phase_w_.set_duty_cycle(duty_cycle_W);
+        data_.duty_cycle_u = phase_u_.get_duty_cycle();
+        data_.duty_cycle_v = phase_v_.get_duty_cycle();
+        data_.duty_cycle_w = phase_w_.get_duty_cycle();
     }
 
     inline void set_frequency(uint32_t frequency) {
@@ -61,9 +61,9 @@ public:
     }
 
     inline void set_dead_time(int64_t dead_time_ns) {
-        phase_r_.set_dead_time(dead_time_ns);
-        phase_s_.set_dead_time(dead_time_ns);
-        phase_t_.set_dead_time(dead_time_ns);
+        phase_u_.set_dead_time(dead_time_ns);
+        phase_v_.set_dead_time(dead_time_ns);
+        phase_w_.set_dead_time(dead_time_ns);
     }
 
     inline void turn_on() {
@@ -80,18 +80,18 @@ public:
 private:
     // Constant hardware
     static constexpr auto& ktimer_motor = TimerTraits<MotorTimer>::dev;
-    static constexpr auto& kpinR_P = PhaseTraits<PhaseR>::pin_p;
-    static constexpr auto& kpinR_N = PhaseTraits<PhaseR>::pin_n;
-    static constexpr auto& kpinS_P = PhaseTraits<PhaseS>::pin_p;
-    static constexpr auto& kpinS_N = PhaseTraits<PhaseS>::pin_n;
-    static constexpr auto& kpinT_P = PhaseTraits<PhaseT>::pin_p;
-    static constexpr auto& kpinT_N = PhaseTraits<PhaseT>::pin_n;
+    static constexpr auto& kpinU_P = PhaseTraits<PhaseU>::pin_p;
+    static constexpr auto& kpinU_N = PhaseTraits<PhaseU>::pin_n;
+    static constexpr auto& kpinV_P = PhaseTraits<PhaseV>::pin_p;
+    static constexpr auto& kpinV_N = PhaseTraits<PhaseV>::pin_n;
+    static constexpr auto& kpinW_P = PhaseTraits<PhaseW>::pin_p;
+    static constexpr auto& kpinW_N = PhaseTraits<PhaseW>::pin_n;
 
     [[no_unique_address]] BufferEnable buffer_enable_{};
     static inline Data data_{};
     MotorTimer motor_timer_;
-    PhaseR phase_r_;
-    PhaseS phase_s_;
-    PhaseT phase_t_;
+    PhaseU phase_u_;
+    PhaseV phase_v_;
+    PhaseW phase_w_;
 };
 }

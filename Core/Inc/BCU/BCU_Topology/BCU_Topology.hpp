@@ -7,44 +7,44 @@
 namespace BCU {
     namespace Topology {
         //PWM Objects
-        inline constexpr auto kMotorPhaseR_P = ST_LIB::TimerPin{
+        inline constexpr auto kMotorPhaseU_P = ST_LIB::TimerPin{
            .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_R_P,
-           .channel = Pinout::kpwm_channel_R_P,
+           .pin = Pinout::kPWM_U_P,
+           .channel = Pinout::kpwm_channel_U_P,
         };
 
-        inline constexpr auto kMotorPhaseR_N = ST_LIB::TimerPin{
+        inline constexpr auto kMotorPhaseU_N = ST_LIB::TimerPin{
            .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_R_N,
-           .channel = Pinout::kpwm_channel_R_N,
+           .pin = Pinout::kPWM_U_N,
+           .channel = Pinout::kpwm_channel_U_N,
         };
-        inline constexpr auto kMotorPhaseS_P = ST_LIB::TimerPin{
+        inline constexpr auto kMotorPhaseV_P = ST_LIB::TimerPin{
            .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_S_P,
-           .channel = Pinout::kpwm_channel_S_P,
-        };
-
-        inline constexpr auto kMotorPhaseS_N = ST_LIB::TimerPin{
-           .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_S_N,
-           .channel = Pinout::kpwm_channel_S_N,
+           .pin = Pinout::kPWM_V_P,
+           .channel = Pinout::kpwm_channel_V_P,
         };
 
-        inline constexpr auto kMotorPhaseT_P = ST_LIB::TimerPin{
+        inline constexpr auto kMotorPhaseV_N = ST_LIB::TimerPin{
            .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_T_P,
-           .channel = Pinout::kpwm_channel_T_P,
+           .pin = Pinout::kPWM_V_N,
+           .channel = Pinout::kpwm_channel_V_N,
         };
 
-        inline constexpr auto kMotorPhaseT_N = ST_LIB::TimerPin{
+        inline constexpr auto kMotorPhaseW_P = ST_LIB::TimerPin{
            .af = ST_LIB::TimerAF::PWM,
-           .pin = Pinout::kPWM_T_N,
-           .channel = Pinout::kpwm_channel_T_N,
+           .pin = Pinout::kPWM_W_P,
+           .channel = Pinout::kpwm_channel_W_P,
+        };
+
+        inline constexpr auto kMotorPhaseW_N = ST_LIB::TimerPin{
+           .af = ST_LIB::TimerAF::PWM,
+           .pin = Pinout::kPWM_W_N,
+           .channel = Pinout::kpwm_channel_W_N,
         };
         //timer
         inline constexpr auto kmotor_timer = ST_LIB::TimerDomain::Timer(
             {.request = Pinout::ktimer_PWM},
-             kMotorPhaseR_P, kMotorPhaseR_N, kMotorPhaseS_P, kMotorPhaseS_N, kMotorPhaseT_P, kMotorPhaseT_N);
+             kMotorPhaseU_P, kMotorPhaseU_N, kMotorPhaseV_P, kMotorPhaseV_N, kMotorPhaseW_P, kMotorPhaseW_N);
 
         // PPU signals
         inline constexpr auto kPPUReady_B = ST_LIB::DigitalInputDomain::DigitalInput(Pinout::kREADY_B);
@@ -66,12 +66,12 @@ namespace BCU {
         inline constexpr auto kHall_Supply_B = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kHall_Supply_B);
 
         //Hall Sensors
-        inline constexpr auto kCurrentSenseR_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_R_A,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseR_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_R_B,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseS_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_S_A,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseS_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_S_B,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseT_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_T_A,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseT_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_T_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseU_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_U_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseU_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_U_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseV_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_V_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseV_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_V_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseW_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_A,ST_LIB::ADCDomain::Resolution::BITS_16);
+        inline constexpr auto kCurrentSenseW_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_B,ST_LIB::ADCDomain::Resolution::BITS_16);
 
         // Speedtec
         inline constexpr auto kSpeetecSupply = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
@@ -165,7 +165,7 @@ namespace BCU {
         Topology::kPPUReady_B, Topology::kPPUFault_B, Topology::kPPUReady_A, Topology::kPPUFault_A, Topology::kBufferEnable,
         Topology::kLED_Operational, Topology::kLED_Fault, Topology::kLED_Connecting, Topology::kLED_Can, Topology::kLED_Accelerating, Topology::kLED_Braking,
         Topology::kHall_Supply_A, Topology::kHall_Supply_B,
-        Topology::kCurrentSenseR_A, Topology::kCurrentSenseR_B, Topology::kCurrentSenseS_A, Topology::kCurrentSenseS_B, Topology::kCurrentSenseT_A, Topology::kCurrentSenseT_B,
+        Topology::kCurrentSenseU_A, Topology::kCurrentSenseU_B, Topology::kCurrentSenseV_A, Topology::kCurrentSenseV_B, Topology::kCurrentSenseW_A, Topology::kCurrentSenseW_B,
         Topology::kSpeetecSupply,
         Topology::kTempSensorA, Topology::kTempSensorB,
         Topology::kVoltageSensorA, Topology::kVoltageSensorB,
@@ -174,20 +174,20 @@ namespace BCU {
     namespace Types{
         //Motor 
         using MotorTimer = ST_LIB::TimerWrapper<Topology::kmotor_timer>;
-        using PhaseR = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseR_P, Topology::kMotorPhaseR_N>());
-        using PhaseS = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseS_P, Topology::kMotorPhaseS_N>());
-        using PhaseT = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseT_P, Topology::kMotorPhaseT_N>());
+        using PhaseU = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseU_P, Topology::kMotorPhaseU_N>());
+        using PhaseV = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseV_P, Topology::kMotorPhaseV_N>());
+        using PhaseW = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseW_P, Topology::kMotorPhaseW_N>());
         using BufferEnable = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_CLOSE, Topology::kBufferEnable>());
         
-        using SynchronousMotor = Devices::ThreePhaseMotor<BCU::Board, BCU::Types::MotorTimer, BCU::Types::PhaseR, BCU::Types::PhaseS, BCU::Types::PhaseT, BCU::Types::BufferEnable>;
+        using SynchronousMotor = Devices::ThreePhaseMotor<BCU::Board, BCU::Types::MotorTimer, BCU::Types::PhaseU, BCU::Types::PhaseV, BCU::Types::PhaseW, BCU::Types::BufferEnable>;
         //Current Sensor
         using HallSupply_A = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_A>());
         using HallSupply_B = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_B>());
 
         using CurrentSenseA = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_A,Configuration::currentSense_A,
-                                Topology::kCurrentSenseR_A,BCU::Topology::kCurrentSenseS_A,Topology::kCurrentSenseT_A>;
+                                Topology::kCurrentSenseU_A,BCU::Topology::kCurrentSenseV_A,Topology::kCurrentSenseW_A>;
         using CurrentSenseB = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_B,Configuration::currentSense_B,
-                                Topology::kCurrentSenseR_B,Topology::kCurrentSenseS_B,Topology::kCurrentSenseT_B>;
+                                Topology::kCurrentSenseU_B,Topology::kCurrentSenseV_B,Topology::kCurrentSenseW_B>;
 
         //Voltage Sensors
         using VoltageSense = Sensor<Board,Types::VoltageSense_Data,Devices::NoSupply,Configuration::voltageSense,

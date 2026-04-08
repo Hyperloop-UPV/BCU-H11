@@ -10,16 +10,16 @@ namespace Configuration{
     inline constexpr int deadTime_ns = 300;
     inline constexpr int switchingFrequency_Hz = 1000;
 
-    inline constexpr SensorConfig::Config currentSense_R_A{1.0f, 0.0f};
-    inline constexpr SensorConfig::Config currentSense_S_A{1.0f, 0.0f};
-    inline constexpr SensorConfig::Config currentSense_T_A{1.0f, 0.0f};
-    inline constexpr std::array<SensorConfig::Config,3> currentSense_A{currentSense_R_A,currentSense_S_A,currentSense_T_A};
+    inline constexpr SensorConfig::Config currentSense_U_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_V_A{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_W_A{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,3> currentSense_A{currentSense_U_A,currentSense_V_A,currentSense_W_A};
 
 
-    inline constexpr SensorConfig::Config currentSense_R_B{1.0f, 0.0f};
-    inline constexpr SensorConfig::Config currentSense_S_B{1.0f, 0.0f};
-    inline constexpr SensorConfig::Config currentSense_T_B{1.0f, 0.0f};
-    inline constexpr std::array<SensorConfig::Config,3> currentSense_B{currentSense_R_B,currentSense_S_B,currentSense_T_B};
+    inline constexpr SensorConfig::Config currentSense_U_B{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_V_B{1.0f, 0.0f};
+    inline constexpr SensorConfig::Config currentSense_W_B{1.0f, 0.0f};
+    inline constexpr std::array<SensorConfig::Config,3> currentSense_B{currentSense_U_B,currentSense_V_B,currentSense_W_B};
 
     inline constexpr SensorConfig::Config voltageSense_A{1.0f, 0.0f};
     inline constexpr SensorConfig::Config voltageSense_B{1.0f, 0.0f};
@@ -31,23 +31,23 @@ namespace Configuration{
 }
 namespace Pinout {
 //PWM R
-inline constexpr auto& kPWM_R_P = ST_LIB::PE9;
-inline constexpr auto& kPWM_R_N = ST_LIB::PE8;
+inline constexpr auto& kPWM_U_P = ST_LIB::PE9;
+inline constexpr auto& kPWM_U_N = ST_LIB::PE8;
 
-inline constexpr auto kpwm_channel_R_P = ST_LIB::TimerChannel::CHANNEL_1;
-inline constexpr auto kpwm_channel_R_N = ST_LIB::TimerChannel::CHANNEL_1_NEGATED;
+inline constexpr auto kpwm_channel_U_P = ST_LIB::TimerChannel::CHANNEL_1;
+inline constexpr auto kpwm_channel_U_N = ST_LIB::TimerChannel::CHANNEL_1_NEGATED;
 //PWM S
-inline constexpr auto& kPWM_S_P = ST_LIB::PE11;
-inline constexpr auto& kPWM_S_N = ST_LIB::PE10;
+inline constexpr auto& kPWM_V_P = ST_LIB::PE11;
+inline constexpr auto& kPWM_V_N = ST_LIB::PE10;
 
-inline constexpr auto kpwm_channel_S_P = ST_LIB::TimerChannel::CHANNEL_2;
-inline constexpr auto kpwm_channel_S_N = ST_LIB::TimerChannel::CHANNEL_2_NEGATED;
+inline constexpr auto kpwm_channel_V_P = ST_LIB::TimerChannel::CHANNEL_2;
+inline constexpr auto kpwm_channel_V_N = ST_LIB::TimerChannel::CHANNEL_2_NEGATED;
 //PWM T
-inline constexpr auto& kPWM_T_P = ST_LIB::PE13;
-inline constexpr auto& kPWM_T_N = ST_LIB::PE12;
+inline constexpr auto& kPWM_W_P = ST_LIB::PE13;
+inline constexpr auto& kPWM_W_N = ST_LIB::PE12;
 
-inline constexpr auto kpwm_channel_T_P = ST_LIB::TimerChannel::CHANNEL_3;
-inline constexpr auto kpwm_channel_T_N = ST_LIB::TimerChannel::CHANNEL_3_NEGATED;
+inline constexpr auto kpwm_channel_W_P = ST_LIB::TimerChannel::CHANNEL_3;
+inline constexpr auto kpwm_channel_W_N = ST_LIB::TimerChannel::CHANNEL_3_NEGATED;
 // timer
 inline constexpr auto ktimer_PWM = ST_LIB::TimerRequest::Advanced_1;
 
@@ -61,12 +61,12 @@ inline constexpr auto& kFAULT_A = ST_LIB::PB6;
 inline constexpr auto& kBuffer_Enable = ST_LIB::PF4;
 
 // Current sense signals
-inline constexpr auto& kCurrentSense_R_A = ST_LIB::PA0;
-inline constexpr auto& kCurrentSense_R_B = ST_LIB::PA6;
-inline constexpr auto& kCurrentSense_S_A = ST_LIB::PA4;
-inline constexpr auto& kCurrentSense_S_B = ST_LIB::PB0;
-inline constexpr auto& kCurrentSense_T_A = ST_LIB::PA5;
-inline constexpr auto& kCurrentSense_T_B = ST_LIB::PB1;
+inline constexpr auto& kCurrentSense_U_A = ST_LIB::PA0;
+inline constexpr auto& kCurrentSense_U_B = ST_LIB::PA6;
+inline constexpr auto& kCurrentSense_V_A = ST_LIB::PA4;
+inline constexpr auto& kCurrentSense_V_B = ST_LIB::PB0;
+inline constexpr auto& kCurrentSense_W_A = ST_LIB::PA5;
+inline constexpr auto& kCurrentSense_W_B = ST_LIB::PB1;
 
 inline constexpr auto& kHall_Supply_A = ST_LIB::PD12;
 inline constexpr auto& kHall_Supply_B = ST_LIB::PD11;
@@ -121,9 +121,9 @@ namespace Types {
     struct CurrentSense_Data{
         union{
         struct{
-            float current_R;
-            float current_S;
-            float current_T;
+            float current_U;
+            float current_V;
+            float current_W;
         };
         float raw[3];
         };
