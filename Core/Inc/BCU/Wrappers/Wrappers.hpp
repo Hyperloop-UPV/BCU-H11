@@ -1,21 +1,19 @@
 #pragma once
 #include "ST-LIB.hpp"
 
-
 namespace Devices {
- //OUTPUT LOGIC (Normally Open or Normally Closed)
-    enum class OLogic: uint8_t{
-        N_OPEN,
-        N_CLOSE,
-    };
+// OUTPUT LOGIC (Normally Open or Normally Closed)
+enum class OLogic : uint8_t {
+    N_OPEN,
+    N_CLOSE,
+};
 
-template <typename Board,OLogic Logic,const auto& DO>
-class DigitalOutputWrapper {    
-    private:
+template <typename Board, OLogic Logic, const auto& DO> class DigitalOutputWrapper {
+private:
     using DigitalOutput = ST_LIB::DigitalOutputDomain::DigitalOutput;
 
-    public:
-    consteval DigitalOutputWrapper(){}
+public:
+    consteval DigitalOutputWrapper() {}
 
     inline void turn_on() {
         auto& gpio_instance = Board::template instance_of<DO>();
@@ -35,4 +33,4 @@ class DigitalOutputWrapper {
     }
 };
 
-} // namespace BCU
+} // namespace Devices

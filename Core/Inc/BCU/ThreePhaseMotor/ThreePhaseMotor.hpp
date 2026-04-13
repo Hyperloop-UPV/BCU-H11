@@ -2,15 +2,18 @@
 #include "../Traits/Traits.hpp"
 #include "ST-LIB.hpp"
 
-namespace Devices{
+namespace Devices {
 
-template<typename Board, typename MotorTimer, typename PhaseU, typename PhaseV, typename PhaseW, typename BufferEnable>
+template <
+    typename Board,
+    typename MotorTimer,
+    typename PhaseU,
+    typename PhaseV,
+    typename PhaseW,
+    typename BufferEnable>
 class ThreePhaseMotor {
-public: 
-    enum class State : uint8_t {
-        Inactive,
-        Active
-    };
+public:
+    enum class State : uint8_t { Inactive, Active };
     struct Data {
         int64_t dead_time_ns;
         float duty_cycle_u;
@@ -20,21 +23,22 @@ public:
         State state;
     };
 
-    explicit ThreePhaseMotor(uint64_t deadtime_ns = 300) :
-        motor_timer_(&Board::template instance_of<ktimer_motor>()),
-        phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
-        phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
-        phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>())
-    {
+    explicit ThreePhaseMotor(uint64_t deadtime_ns = 300)
+        : motor_timer_(&Board::template instance_of<ktimer_motor>()),
+          phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
+          phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
+          phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>()) {
         set_dead_time(deadtime_ns);
     }
 
     const Data& subscribe() { return data_; }
 
-    template<typename T>
-    inline void set_duty_cycle(float duty_cycle) {
-        static_assert(std::is_same_v<T, PhaseU> || std::is_same_v<T, PhaseV> || std::is_same_v<T, PhaseW>, "Invalid phase type");
-        
+    template <typename T> inline void set_duty_cycle(float duty_cycle) {
+        static_assert(
+            std::is_same_v<T, PhaseU> || std::is_same_v<T, PhaseV> || std::is_same_v<T, PhaseW>,
+            "Invalid phase type"
+        );
+
         if constexpr (std::is_same_v<T, PhaseU>) {
             phase_u_.set_duty_cycle(duty_cycle);
             data_.duty_cycle_u = phase_u_.get_duty_cycle();
@@ -67,13 +71,24 @@ public:
         phase_w_.set_dead_time(dead_time_ns);
         data_.dead_time_ns = dead_time_ns;
     }
-
-    inline void turn_on() {
+    inline void start(
+        float duty_cycle_U,
+        float duty_cycle_V,
+        float duty_cycle_W,
+        uint32_t frequency,
+        int64_t dead_time_ns
+    ) {
+        set_dead_time(dead_time_ns);
+        set_frequency(frequency);
+        set_duty_cycle(duty_cycle_U, duty_cycle_V, duty_cycle_W);
+        start();
+    }
+    inline void start() {
         buffer_enable_.turn_on();
         data_.state = State::Active;
     }
 
-    inline void turn_off() {
+    inline void stop() {
         buffer_enable_.turn_off();
         set_duty_cycle(0.0f, 0.0f, 0.0f);
         data_.state = State::Inactive;
@@ -96,4 +111,4 @@ private:
     PhaseV phase_v_;
     PhaseW phase_w_;
 };
-}
+} // namespace Devices
