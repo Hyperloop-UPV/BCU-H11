@@ -1,6 +1,10 @@
 #pragma once
 #include "BCU/Config/Config.hpp"
+#include "BCU/Wrappers/Wrappers.hpp"
 #include "BCU/Sensor/Sensor.hpp"
+#include "BCU/Speetec/Speetec.hpp"
+#include "BCU/Inverter_Feedback/Inverter_Feedback.hpp"
+#include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
 #include "ST-LIB.hpp"
 
 
@@ -110,14 +114,6 @@ inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 } // namespace Pinout
 
 namespace Types {
-      //OUTPUT LOGIC (Normally Open or Normally Closed)
-        enum class OLogic: uint8_t{
-            N_OPEN,
-            N_CLOSE,
-        };
-
-    
-
     struct CurrentSense_Data{
         union{
         struct{
