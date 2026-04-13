@@ -12,10 +12,11 @@ public:
         Active
     };
     struct Data {
-        int frequency;
+        int64_t dead_time_ns;
         float duty_cycle_u;
         float duty_cycle_v;
         float duty_cycle_w;
+        uint32_t frequency;
         State state;
     };
 
@@ -64,6 +65,7 @@ public:
         phase_u_.set_dead_time(dead_time_ns);
         phase_v_.set_dead_time(dead_time_ns);
         phase_w_.set_dead_time(dead_time_ns);
+        data_.dead_time_ns = dead_time_ns;
     }
 
     inline void turn_on() {
