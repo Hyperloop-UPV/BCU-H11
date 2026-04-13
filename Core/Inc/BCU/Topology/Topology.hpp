@@ -1,9 +1,7 @@
 #pragma once
-#include "ST-LIB.hpp"
 #include "BCU/Data/Data.hpp"
-#include "BCU/Wrappers/Wrappers.hpp"
 #include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
-#include "BCU/Inverter_Feedback/Inverter_Feedback.hpp"
+
 namespace BCU {
     namespace Topology {
         //PWM Objects
@@ -69,7 +67,7 @@ namespace BCU {
         inline constexpr auto kCurrentSenseU_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_U_A,ST_LIB::ADCDomain::Resolution::BITS_16);
         inline constexpr auto kCurrentSenseU_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_U_B,ST_LIB::ADCDomain::Resolution::BITS_16);
         inline constexpr auto kCurrentSenseV_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_V_A,ST_LIB::ADCDomain::Resolution::BITS_16);
-        inline constexpr auto kCurrentSenseV_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_V_B,ST_LIB::ADCDomain::Resolution::BITS_16);
+       inline constexpr auto kCurrentSenseV_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_V_B,ST_LIB::ADCDomain::Resolution::BITS_16);
         inline constexpr auto kCurrentSenseW_A = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_A,ST_LIB::ADCDomain::Resolution::BITS_16);
         inline constexpr auto kCurrentSenseW_B = ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_B,ST_LIB::ADCDomain::Resolution::BITS_16);
 
@@ -158,14 +156,14 @@ namespace BCU {
         #endif
         #endif
     } // namespace BCU_Topology
-    using Board = ST_LIB::Board< 
+    using BCUBoard = ST_LIB::Board< 
     #ifdef STLIB_ETH
         Topology::eth,
     #endif
         Topology::kPPUReady_B, Topology::kPPUFault_B, Topology::kPPUReady_A, Topology::kPPUFault_A, Topology::kBufferEnable,
         Topology::kLED_Operational, Topology::kLED_Fault, Topology::kLED_Connecting, Topology::kLED_Can, Topology::kLED_Accelerating, Topology::kLED_Braking,
         Topology::kHall_Supply_A, Topology::kHall_Supply_B,
-        Topology::kCurrentSenseU_A, Topology::kCurrentSenseU_B, Topology::kCurrentSenseV_A, Topology::kCurrentSenseV_B, Topology::kCurrentSenseW_A, Topology::kCurrentSenseW_B,
+        Topology::kCurrentSenseU_A, Topology::kCurrentSenseU_B, Topology::kCurrentSenseV_A, Topology::kCurrentSenseV_B , Topology::kCurrentSenseW_A, Topology::kCurrentSenseW_B,
         Topology::kSpeetecSupply,
         Topology::kTempSensorA, Topology::kTempSensorB,
         Topology::kVoltageSensorA, Topology::kVoltageSensorB,
@@ -177,36 +175,43 @@ namespace BCU {
         using PhaseU = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseU_P, Topology::kMotorPhaseU_N>());
         using PhaseV = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseV_P, Topology::kMotorPhaseV_N>());
         using PhaseW = decltype(std::declval<MotorTimer>().template get_dual_pwm<Topology::kMotorPhaseW_P, Topology::kMotorPhaseW_N>());
-        using BufferEnable = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_CLOSE, Topology::kBufferEnable>());
+        using BufferEnable = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kBufferEnable>());
         
-        using SynchronousMotor = Devices::ThreePhaseMotor<BCU::Board, BCU::Types::MotorTimer, BCU::Types::PhaseU, BCU::Types::PhaseV, BCU::Types::PhaseW, BCU::Types::BufferEnable>;
+        using SynchronousMotor = Devices::ThreePhaseMotor<BCUBoard, BCU::Types::MotorTimer, BCU::Types::PhaseU, BCU::Types::PhaseV, BCU::Types::PhaseW, BCU::Types::BufferEnable>;
         //Current Sensor
-        using HallSupply_A = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_A>());
-        using HallSupply_B = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kHall_Supply_B>());
+        using HallSupply_A = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kHall_Supply_A>());
+        using HallSupply_B = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kHall_Supply_B>());
 
-        using CurrentSenseA = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_A,Configuration::currentSense_A,
+        using CurrentSenseA = Sensor<BCUBoard,Types::CurrentSense_Data,Types::HallSupply_A,Configuration::currentSense_A,
                                 Topology::kCurrentSenseU_A,BCU::Topology::kCurrentSenseV_A,Topology::kCurrentSenseW_A>;
-        using CurrentSenseB = Sensor<Board,Types::CurrentSense_Data,Types::HallSupply_B,Configuration::currentSense_B,
-                                Topology::kCurrentSenseU_B,Topology::kCurrentSenseV_B,Topology::kCurrentSenseW_B>;
+       using CurrentSenseB = Sensor<BCUBoard,Types::CurrentSense_Data,Types::HallSupply_B,Configuration::currentSense_B,
+                               Topology::kCurrentSenseU_B,Topology::kCurrentSenseV_B,Topology::kCurrentSenseW_B>;
 
         //Voltage Sensors
-        using VoltageSense = Sensor<Board,Types::VoltageSense_Data,Devices::NoSupply,Configuration::voltageSense,
+        using VoltageSense = Sensor<BCUBoard,Types::VoltageSense_Data,Devices::NoSupply,Configuration::voltageSense,
                                 Topology::kVoltageSensorA,Topology::kVoltageSensorB>;
 
         //Temperature Sensor
-        using TempSense = Sensor<Board,Types::TempSense_Data,Devices::NoSupply,Configuration::tempSense,
+        using TempSense = Sensor<BCUBoard,Types::TempSense_Data,Devices::NoSupply,Configuration::tempSense,
                                 Topology::kTempSensorA,Topology::kTempSensorB>;
 
         //Encoder 
-        using SpeetecSupply = decltype(DigitalOutputWrapper<Board, Types::OLogic::N_OPEN, Topology::kSpeetecSupply>());
+        using SpeetecSupply = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kSpeetecSupply>());
         using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
         using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
 
         //Inverter 
-        using InverterA = Devices::Inverter_Feedback<Board,Types::Inverter_Data,Topology::kPPUReady_A,Topology::kPPUFault_A>;
-        using InverterB = Devices::Inverter_Feedback<Board,Types::Inverter_Data,Topology::kPPUReady_B,Topology::kPPUFault_B>;
-
-
+        using InverterA = Devices::Inverter_Feedback<BCUBoard,Types::Inverter_Data,Topology::kPPUReady_A,Topology::kPPUFault_A>;
+        using InverterB = Devices::Inverter_Feedback<BCUBoard,Types::Inverter_Data,Topology::kPPUReady_B,Topology::kPPUFault_B>;
+    
+        //Leds Types:
+        using LedConnecting = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Connecting>());
+        using LedOperational = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Operational>());
+        using LedFault = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Fault>());
+        using LedCan = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Can>());
+        using LedAccelerating = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Accelerating>());
+        using LedBraking = decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Braking>());
+        
     }
     
 
