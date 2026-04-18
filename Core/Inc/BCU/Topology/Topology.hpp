@@ -64,11 +64,11 @@ inline constexpr auto kLED_Operational =
 inline constexpr auto kLED_Fault = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Fault);
 inline constexpr auto kLED_Connecting =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Connecting);
-inline constexpr auto kLED_Can = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Can);
-inline constexpr auto kLED_Accelerating =
-    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Accelerating);
-inline constexpr auto kLED_Braking =
-    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Braking);
+inline constexpr auto kLED_SpaceVector = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_SpaceVector);
+inline constexpr auto kLED_CurrentControl =
+    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_CurrentControl);
+inline constexpr auto kLED_SpeedControl =
+    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_SpeedControl);
 
 // Hall sensor supply
 inline constexpr auto kHall_Supply_A =
@@ -192,9 +192,9 @@ using BCUBoard = ST_LIB::Board<
     Topology::kLED_Operational,
     Topology::kLED_Fault,
     Topology::kLED_Connecting,
-    Topology::kLED_Can,
-    Topology::kLED_Accelerating,
-    Topology::kLED_Braking,
+    Topology::kLED_SpaceVector,
+    Topology::kLED_CurrentControl,
+    Topology::kLED_SpeedControl,
     Topology::kHall_Supply_A,
     Topology::kHall_Supply_B,
     Topology::kCurrentSenseU_A,
@@ -306,16 +306,16 @@ using LedOperational = decltype(Devices::DigitalOutputWrapper<
 using LedFault =
     decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Fault>(
     ));
-using LedCan =
-    decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Can>()
+using LedSpaceVector =
+    decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_SpaceVector>()
     );
-using LedAccelerating = decltype(Devices::DigitalOutputWrapper<
+using LedCurrentControl = decltype(Devices::DigitalOutputWrapper<
                                  BCUBoard,
                                  Devices::OLogic::N_OPEN,
-                                 Topology::kLED_Accelerating>());
-using LedBraking =
+                                 Topology::kLED_CurrentControl>());
+using LedSpeedControl =
     decltype(Devices::
-                 DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Braking>());
+                 DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_SpeedControl>());
 
 } // namespace Types
 

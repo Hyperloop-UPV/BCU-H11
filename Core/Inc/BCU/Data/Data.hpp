@@ -85,9 +85,9 @@ inline constexpr auto& kHall_Supply_B = ST_LIB::PD11;
 inline constexpr auto& kLED_Operational = ST_LIB::PG13;
 inline constexpr auto& kLED_Fault = ST_LIB::PG12;
 inline constexpr auto& kLED_Connecting = ST_LIB::PG11;
-inline constexpr auto& kLED_Can = ST_LIB::PG10;
-inline constexpr auto& kLED_Accelerating = ST_LIB::PG9;
-inline constexpr auto& kLED_Braking = ST_LIB::PG6;
+inline constexpr auto& kLED_SpaceVector = ST_LIB::PG10;
+inline constexpr auto& kLED_CurrentControl = ST_LIB::PG9;
+inline constexpr auto& kLED_SpeedControl = ST_LIB::PG6;
 
 // speetec 1
 inline constexpr auto& kSpeedtec1_IN1 = ST_LIB::PF0;
