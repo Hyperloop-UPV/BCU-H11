@@ -31,6 +31,10 @@ public:
             gpio_instance.turn_on();
         }
     }
+    inline void toggle(){
+        auto& gpio_instance = Board::template instance_of<DO>();
+        gpio_instance.toggle();
+    }
 };
 
 } // namespace Devices

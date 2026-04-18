@@ -11,6 +11,11 @@ public:
         auto& led = get_led<type>();
         led.turn_off();
     }
+    template <typename type> static void toggle() {
+        auto& led = get_led<type>();
+        led.toggle();
+    }
+    
 
 private:
     Leds() = delete;
