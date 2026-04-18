@@ -1,5 +1,5 @@
 #pragma once
-#include "../Traits/Traits.hpp"
+#include "Devices/Traits/Traits.hpp"
 #include "ST-LIB.hpp"
 
 namespace Devices {

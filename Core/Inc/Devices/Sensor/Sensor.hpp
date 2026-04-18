@@ -1,6 +1,6 @@
 #pragma once
 #include "ST-LIB.hpp"
-#include "BCU/Traits/Traits.hpp"
+#include "Devices/Traits/Traits.hpp"
 
 namespace SensorConfig {
 struct Config {
