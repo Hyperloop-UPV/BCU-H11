@@ -15,7 +15,6 @@ public:
         auto& led = get_led<type>();
         led.toggle();
     }
-    
 
 private:
     Leds() = delete;

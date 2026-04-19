@@ -1,17 +1,25 @@
 #pragma once
 #include "BCU/Config/Config.hpp"
-#include "BCU/Wrappers/Wrappers.hpp"
-#include "BCU/Sensor/Sensor.hpp"
-#include "BCU/Speetec/Speetec.hpp"
-#include "BCU/Inverter_Feedback/Inverter_Feedback.hpp"
-#include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
+#include "Devices/Wrappers/Wrappers.hpp"
+#include "Devices/Sensor/Sensor.hpp"
+#include "Devices/Speetec/Speetec.hpp"
+#include "Devices/Inverter_Feedback/Inverter_Feedback.hpp"
+#include "Devices/ThreePhaseMotor/ThreePhaseMotor.hpp"
 #include "ST-LIB.hpp"
 
 namespace BCU {
 
 namespace Configuration {
-inline constexpr int deadTime_ns = 300;
-inline constexpr int switchingFrequency_Hz = 1000;
+using namespace std::chrono_literals;
+// times related
+inline constexpr int64_t deadTime_ns = 300;
+inline constexpr uint32_t switchingFrequency_Hz = 1000;
+inline constexpr auto Connecting_Cyclic_action = ms(500);
+
+// filter sizes
+inline constexpr size_t FilterSizeCurrent = 1;
+inline constexpr size_t FilterSizeVoltage = 1;
+inline constexpr size_t FilterSizeTemp = 1;
 
 inline constexpr SensorConfig::Config currentSense_U_A{1.0f, 0.0f};
 inline constexpr SensorConfig::Config currentSense_V_A{1.0f, 0.0f};
@@ -122,29 +130,29 @@ namespace Types {
 struct CurrentSense_Data {
     union {
         struct {
-            float current_U;
-            float current_V;
-            float current_W;
+            double current_U;
+            double current_V;
+            double current_W;
         };
-        float raw[3];
+        double raw[3];
     };
 };
 struct VoltageSense_Data {
     union {
         struct {
-            float voltage_A;
-            float voltage_B;
+            double voltage_A;
+            double voltage_B;
         };
-        float raw[2];
+        double raw[2];
     };
 };
 struct TempSense_Data {
     union {
         struct {
-            float temp_A;
-            float temp_B;
+            double temp_A;
+            double temp_B;
         };
-        float raw[2];
+        double raw[2];
     };
 };
 struct Inverter_Data {

@@ -77,7 +77,7 @@ public:
         float duty_cycle_W,
         uint32_t frequency,
         int64_t dead_time_ns
-    ){
+    ) {
         set_dead_time(dead_time_ns);
         set_frequency(frequency);
         set_duty_cycle(duty_cycle_U, duty_cycle_V, duty_cycle_W);
@@ -86,7 +86,7 @@ public:
         buffer_enable_.turn_on();
         data_.state = State::Active;
     }
-    inline void disengage(){
+    inline void disengage() {
         buffer_enable_.turn_off();
         data_.state = State::Inactive;
     }
@@ -94,8 +94,9 @@ public:
         disengage();
         set_duty_cycle(0.0f, 0.0f, 0.0f);
     }
-     inline void start(float duty_u, float duty_v, float duty_w, uint32_t frequency,int64_t dead_time_ns) {
-        setup_signals(duty_u,duty_v,duty_w,frequency,dead_time_ns);
+    inline void
+    start(float duty_u, float duty_v, float duty_w, uint32_t frequency, int64_t dead_time_ns) {
+        setup_signals(duty_u, duty_v, duty_w, frequency, dead_time_ns);
         engage();
     }
 
