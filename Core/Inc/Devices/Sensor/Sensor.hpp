@@ -10,7 +10,14 @@ struct Config {
 };
 } // namespace SensorConfig
 
-template <typename Board, typename Data, typename DOSupply, const auto& kConfig, auto&... adcs>
+template <
+    typename Board,
+    typename DataType,
+    typename Data,
+    typename DOSupply,
+    size_t FilterSize,
+    const auto& kConfig,
+    auto&... adcs>
 class Sensor {
 public:
     using ConfigType = std::decay_t<decltype(kConfig)>;
@@ -56,16 +63,18 @@ public:
 
 private:
     static inline Data data_{};
-    std::array<LinearSensor<float>, kNumberSensors> sensors_;
+    std::array<MovingAverage<FilterSize>, kNumberSensors> filters_;
+    std::array<FilteredLinearSensor<DataType, FilterSize>, kNumberSensors> sensors_;
     [[no_unique_address]] DOSupply supply_{};
 
     template <std::size_t... Is>
     explicit Sensor(std::index_sequence<Is...>)
-        : sensors_{LinearSensor<float>(
+        : sensors_{FilteredLinearSensor<DataType, FilterSize>(
               Board::template instance_of<adcs>(),
               kConfig[Is].slope,
               kConfig[Is].offset,
-              data_.raw[Is]
+              data_.raw[Is],
+              filters_[Is]
           )...} {}
 
     template <auto& TargetADC> static constexpr std::size_t get_index() {
