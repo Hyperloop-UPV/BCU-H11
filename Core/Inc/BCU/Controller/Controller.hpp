@@ -1,31 +1,96 @@
+#pragma once
 #include "BCU/Topology/Topology.hpp"
 #include "BCU/Leds/Leds.hpp"
 #include "BCU/Comms/Comms.hpp"
-
+#include "BCU/MotionControl/CurrentController.hpp"
+#include "BCU/MotionControl/SpaceVectorModulator.hpp"
+#include "BCU/MotionControl/SpeedController.hpp"
 namespace BCU {
 class Controller {
     using GeneralStates = DataPackets::Bcu_general_state;
-    using OperationalStates = DataPackets::Bcu_control_state;
+    using OperationalStates = DataPackets::Bcu_operational_state;
 
 public:
-    Controller() {
+    static inline void update() {
+        update_auxiliary_telemetry();
+        if (OrderPackets::Configure_Commutation_Parameters_flag) {
+            OrderPackets::Configure_Commutation_Parameters_flag = false;
+            motor_.set_frequency(Comms::commutation_frequency_received);
+            motor_.set_dead_time(Comms::dead_time_ns_received);
+        }
+        if (OrderPackets::Change_angle_offset_flag) {
+            OrderPackets::Change_angle_offset_flag = false;
+            CurrentController::set_angle_offset(Comms::angle_offset_received);
+        }
+    }
+    static inline void init() {
+        BCUBoard::init();
+        // Link Communications
+        Comms::init<
+            Devices::ThreePhaseMotorDefs::Data,
+            Types::CurrentSense_Data,
+            Types::VoltageSense_Data,
+            Types::TempSense_Data,
+            Devices::SpeetecDefs::Data>(
+            telemetryData.motor,
+            telemetryData.currentSenseA,
+            telemetryData.currentSenseB,
+            telemetryData.VoltageSense,
+            dataTemp,
+            telemetryData.speetec1,
+            telemetryData.speetec2,
+            dataStateMachine
+        );
+
         // turn on sensors
         voltageSense_.turn_on();
         currentSenseA_.turn_on();
         currentSenseB_.turn_on();
+        speetec1_.turn_on();
+        speetec2_.turn_on();
+        // Crear las Acciones ciclicas
+        Scheduler::register_task(ControlConf::CurrentControlPeriod, &on_current_control);
+        Scheduler::register_task(ControlConf::SpaceVectorPeriod, &on_space_vector);
+        Scheduler::register_task(ControlConf::SpeedControlPeriod, &on_speed_control);
     }
 
 private:
-    static inline void update_vital_telemetry() {
+    Controller() = delete;
+
+    static inline void update_control_telemetry() {
         voltageSense_.read();
         currentSenseA_.read();
         currentSenseB_.read();
+        speetec1_.read();
+        speetec2_.read();
         // read encoder
     }
-    static inline void update_other_telemetry() {
+    static inline void update_auxiliary_telemetry() {
         inverterA_.read();
         inverterB_.read();
         tempSense_.read();
+        dataStateMachine.currentGeneralState = BCU_State_Machine.get_current_state();
+        dataStateMachine.currentOperationalState = Operational_State_Machine.get_current_state();
+    }
+    static inline void on_current_control() {
+        update_control_telemetry();
+        dataStateMachine.currentOperationalState = Operational_State_Machine.get_current_state();
+        if (dataStateMachine.currentOperationalState == OperationalStates::Current_Control ||
+            dataStateMachine.currentOperationalState == OperationalStates::Speed_Control) {
+            Types::DutyCycles duties = CurrentController::execute(telemetryData);
+            motor_.set_duty_cycle(duties.u, duties.v, duties.w);
+        }
+    }
+    static inline void on_space_vector() {
+        if (Operational_State_Machine.get_current_state() == OperationalStates::Space_Vector) {
+            Types::DutyCycles duties = SpaceVectorModulator::execute();
+            motor_.set_duty_cycle(duties.u, duties.v, duties.w);
+        }
+    }
+    static inline void on_speed_control() {
+        if (Operational_State_Machine.get_current_state() == OperationalStates::Speed_Control) {
+            CurrentController::set_q_ref(SpeedController::execute(telemetryData));
+        }
     }
     static bool check_stop_motor() {
         if (OrderPackets::Stop_Control_flag == true /*||Other thing*/) {
@@ -41,9 +106,28 @@ private:
     inline static Types::TempSense tempSense_{};
     inline static Types::InverterA inverterA_{};
     inline static Types::InverterB inverterB_{};
-    inline static Types::EncoderTimer1 encoderTimer1_{};
-    inline static Types::EncoderTimer2 encoderTimer2_{};
+    inline static Types::Speetec1 speetec1_{
+        HardwareConf::counter_distance_m,
+        HardwareConf::sample_time_s
+    };
+    inline static Types::Speetec2 speetec2_{
+        HardwareConf::counter_distance_m,
+        HardwareConf::sample_time_s
+    };
 
+    // Data
+    inline static auto& dataTemp = tempSense_.subscribe();
+    inline static auto& dataInverterA = inverterA_.subscribe();
+    inline static auto& dataInverterB = inverterB_.subscribe();
+    inline static Types::StateMachineData dataStateMachine{};
+    inline static Types::TelemetryData telemetryData{
+        .motor = motor_.subscribe(),
+        .VoltageSense = voltageSense_.subscribe(),
+        .currentSenseA = currentSenseA_.subscribe(),
+        .currentSenseB = currentSenseB_.subscribe(),
+        .speetec1 = speetec1_.subscribe(),
+        .speetec2 = speetec2_.subscribe()
+    };
     // ---------- General States ------------------------
     static constexpr auto connecting_state = make_state(
         GeneralStates::Connecting,
@@ -140,8 +224,12 @@ private:
     //-----------Operational States-----------------//
 
     //---- Enter Actions  ---------//
-    static constexpr void enter_idle_state() { motor_.stop(); }
-    static constexpr void enter_TestPWM_state() {
+    static void enter_idle_state() {
+        OrderPackets::Stop_Control_flag = false;
+        motor_.stop();
+    }
+    static void enter_TestPWM_state() {
+        OrderPackets::Start_Test_PWM_flag = false;
         Leds::turn_on<Types::LedSpaceVector>();
         Leds::turn_on<Types::LedSpeedControl>();
         Leds::turn_on<Types::LedCurrentControl>();
@@ -149,52 +237,73 @@ private:
             Comms::duty_cycle_u_received,
             Comms::duty_cycle_v_received,
             Comms::duty_cycle_w_received,
-            Comms::modulation_frequency_received,
-            Comms::dead_time_ns_received
+            Comms::commutation_frequency_received
         );
     }
-    static constexpr void enter_SpaceVector_state() { Leds::turn_on<Types::LedSpaceVector>(); }
-    static constexpr void enter_CurrentControl_state() {
+    static void enter_SpaceVector_state() {
+        OrderPackets::Start_Current_Control_flag = false;
+        motor_.set_frequency(Comms::commutation_frequency_received);
+        motor_.engage();
+        SpaceVectorModulator::set_modulation_freq(Comms::modulation_frequency_received);
+        SpaceVectorModulator::set_modulation_index(
+            Comms::voltage_reference_received,
+            Comms::voltage_max_received
+        );
+        Leds::turn_on<Types::LedSpaceVector>();
+    }
+    static void enter_CurrentControl_state() {
+        OrderPackets::Start_Current_Control_flag = false;
+        motor_.set_frequency(Comms::commutation_frequency_received);
+        motor_.engage();
+        CurrentController::set_d_ref(Comms::d_current_reference_received);
+        CurrentController::set_q_ref(Comms::q_current_reference_received);
+        CurrentController::reset();
         Leds::turn_on<Types::LedCurrentControl>();
     }
-    static constexpr void enter_SpeedControl_state() { Leds::turn_on<Types::LedSpeedControl>(); }
-    //------Exit Actions ------------------------//
-    static constexpr void exit_TestPWM_state() {
+    static void enter_SpeedControl_state() {
+        OrderPackets::Start_Speed_Control_flag = false;
+        SpeedController::set_speed_m_s(Comms::target_linear_speed_received);
+        motor_.engage();
+        Leds::turn_on<Types::LedSpeedControl>();
+    }
+    //--
+    //----Exit Actions ------------------------//
+    static void exit_TestPWM_state() {
         motor_.stop();
         Leds::turn_off<Types::LedSpaceVector>();
         Leds::turn_off<Types::LedSpeedControl>();
         Leds::turn_off<Types::LedCurrentControl>();
     }
-    static constexpr void exit_SpaceVector_state() {
+    static void exit_SpaceVector_state() {
         motor_.stop();
         Leds::turn_off<Types::LedSpaceVector>();
     }
-    static constexpr void exit_CurrentControl_state() {
+    static void exit_CurrentControl_state() {
         motor_.stop();
         Leds::turn_off<Types::LedCurrentControl>();
     }
-    static constexpr void exit_SpeedControl_state() {
+    static void exit_SpeedControl_state() {
         motor_.stop();
         Leds::turn_off<Types::LedSpeedControl>();
     }
 
     // ------------- General State Machine ---------------------//
     //------------Enter Actions --------------------------//
-    static constexpr void enter_Operational_state() { Leds::turn_on<Types::LedOperational>(); }
-    static constexpr void enter_Fault_state() {
+    static void enter_Operational_state() { Leds::turn_on<Types::LedOperational>(); }
+    static void enter_Fault_state() {
         motor_.stop();
         ProtectionManager::propagate_fault();
         Leds::turn_on<Types::LedFault>();
     }
     //----------------- Exit Actions ----------------------//
-    static constexpr void exit_Connecting_state() { Leds::turn_off<Types::LedConnecting>(); }
-    static constexpr void exit_Operational_state() {
+    static void exit_Connecting_state() { Leds::turn_off<Types::LedConnecting>(); }
+    static void exit_Operational_state() {
         motor_.stop();
         Leds::turn_off<Types::LedOperational>();
     }
-    static constexpr void exit_Fault_state() { Leds::turn_off<Types::LedFault>(); }
+    static void exit_Fault_state() { Leds::turn_off<Types::LedFault>(); }
 
-    static constexpr void Connecting_cyclic_action() { Leds::toggle<Types::LedConnecting>(); }
+    static void Connecting_cyclic_action() { Leds::toggle<Types::LedConnecting>(); }
 
     // Create Operational Machine
     static inline constinit auto Operational_State_Machine = []() consteval {
@@ -230,7 +339,7 @@ private:
         return sm;
     }();
 
-    static inline constinit auto PCU_State_Machine = []() consteval {
+    static inline constinit auto BCU_State_Machine = []() consteval {
         auto nested = StateMachineHelper::add_nesting(operational_state, Operational_State_Machine);
         auto sm = make_state_machine(
             GeneralStates::Connecting,
@@ -259,7 +368,7 @@ private:
         // Connecting: cyclic actions
         sm.add_cyclic_action(
             []() { Connecting_cyclic_action(); },
-            Configuration::Connecting_Cyclic_action,
+            ControlConf::Connecting_Cyclic_action,
             connecting_state
         );
         return sm;
