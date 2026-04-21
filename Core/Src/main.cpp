@@ -1,25 +1,15 @@
 #include "main.h"
-
-#include "ST-LIB.hpp"
-
+#include "BCU/Topology/Topology.hpp"
+#include "BCU/Controller/Controller.hpp"
 using namespace ST_LIB;
 
-constexpr auto led = ST_LIB::DigitalOutputDomain::DigitalOutput(ST_LIB::PF13);
-
-using MainBoard = ST_LIB::Board<led>;
-
-#ifndef EXAMPLE_SELECTED
+using namespace BCU;
 int main(void) {
-    MainBoard::init();
-
-    auto& led_instance = MainBoard::instance_of<led>();
-
+    Controller::init();
     while (1) {
-        led_instance.toggle();
-        HAL_Delay(200);
+        Controller::update();
     }
 }
-#endif
 
 extern "C" void Error_Handler(void) {
     ErrorHandler("HAL error handler triggered");
