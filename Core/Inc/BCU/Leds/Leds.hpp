@@ -1,3 +1,4 @@
+#pragma once
 #include "BCU/Topology/Topology.hpp"
 
 namespace BCU {
