@@ -5,21 +5,54 @@
 #include "Devices/Speetec/Speetec.hpp"
 #include "Devices/Inverter_Feedback/Inverter_Feedback.hpp"
 #include "Devices/ThreePhaseMotor/ThreePhaseMotor.hpp"
+#include "Communications/Packets/DataPackets.hpp"
 #include "ST-LIB.hpp"
 
 namespace BCU {
 
-namespace Configuration {
+namespace ControlConf {
+// Space Vector
+inline constexpr int32_t SpaceVectorPeriod = 200; // microseconds
+inline constexpr auto SpaceVectorPeriodTime = us(SpaceVectorPeriod);
+// Current Control
+inline constexpr float D_KP_Current{1.0};
+inline constexpr float D_KI_Current{5.0};
+inline constexpr float D_MAX_OUTPUT{220.0};
+inline constexpr float D_MIN_OUTPUT{-D_MAX_OUTPUT};
+
+inline constexpr float Q_KP_Current{1.0};
+inline constexpr float Q_KI_Current{5.0};
+inline constexpr float Q_MAX_OUTPUT{220.0};
+inline constexpr float Q_MIN_OUTPUT{-Q_MAX_OUTPUT};
+
+inline constexpr float polar_pitch{0.096}; // in meters
+inline constexpr int32_t CurrentControlPeriod = 200;
+inline constexpr auto CurrentControlPeriodTime = us(CurrentControlPeriod);
+
+inline constexpr float KP_Speed{6.0};
+inline constexpr float KI_Speed{15.0};
+
+inline constexpr int32_t SpeedControlPeriod = 1000;
+inline constexpr auto SpeedControlPeriodTime = us(SpeedControlPeriod);
+
+inline constexpr auto Connecting_Cyclic_action = ms(500);
+
+} // namespace ControlConf
+namespace HardwareConf {
 using namespace std::chrono_literals;
 // times related
 inline constexpr int64_t deadTime_ns = 300;
 inline constexpr uint32_t switchingFrequency_Hz = 1000;
-inline constexpr auto Connecting_Cyclic_action = ms(500);
 
 // filter sizes
 inline constexpr size_t FilterSizeCurrent = 1;
 inline constexpr size_t FilterSizeVoltage = 1;
 inline constexpr size_t FilterSizeTemp = 1;
+
+// number samples speetec
+inline constexpr size_t samples_speetec = 10;
+inline constexpr double counter_distance_m = 0.0001;
+inline constexpr double sample_time_s = 200.0 / 1e6;
 
 inline constexpr SensorConfig::Config currentSense_U_A{1.0f, 0.0f};
 inline constexpr SensorConfig::Config currentSense_V_A{1.0f, 0.0f};
@@ -46,7 +79,7 @@ inline constexpr std::array<SensorConfig::Config, 2> voltageSense{voltageSense_A
 inline constexpr SensorConfig::Config tempSense_A{1.0f, 0.0f};
 inline constexpr SensorConfig::Config tempSense_B{1.0f, 0.0f};
 inline constexpr std::array<SensorConfig::Config, 2> tempSense{tempSense_A, tempSense_B};
-} // namespace Configuration
+} // namespace HardwareConf
 namespace Pinout {
 // PWM R
 inline constexpr auto& kPWM_U_P = ST_LIB::PE9;
@@ -127,32 +160,43 @@ inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 } // namespace Pinout
 
 namespace Types {
+struct StateMachineData {
+    DataPackets::Bcu_general_state currentGeneralState;
+    DataPackets::Bcu_operational_state currentOperationalState;
+};
+struct DutyCycles {
+    float u;
+    float v;
+    float w;
+    DutyCycles(float u, float v, float w) : u(u), v(v), w(w) {}
+    DutyCycles() : u(0.0f), v(0.0f), w(0.0f) {}
+};
 struct CurrentSense_Data {
     union {
         struct {
-            double current_U;
-            double current_V;
-            double current_W;
+            float U;
+            float V;
+            float W;
         };
-        double raw[3];
+        float raw[3];
     };
 };
 struct VoltageSense_Data {
     union {
         struct {
-            double voltage_A;
-            double voltage_B;
+            float A;
+            float B;
         };
-        double raw[2];
+        float raw[2];
     };
 };
 struct TempSense_Data {
     union {
         struct {
-            double temp_A;
-            double temp_B;
+            float temp_A;
+            float temp_B;
         };
-        double raw[2];
+        float raw[2];
     };
 };
 struct Inverter_Data {
