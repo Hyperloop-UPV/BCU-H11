@@ -4,6 +4,17 @@
 
 namespace Devices {
 
+namespace ThreePhaseMotorDefs {
+enum class State : uint8_t { Inactive, Active };
+struct Data {
+    int64_t dead_time_ns;
+    float duty_cycle_u;
+    float duty_cycle_v;
+    float duty_cycle_w;
+    uint32_t frequency;
+    State state;
+};
+} // namespace ThreePhaseMotorDefs
 template <
     typename Board,
     typename MotorTimer,
@@ -13,16 +24,6 @@ template <
     typename BufferEnable>
 class ThreePhaseMotor {
 public:
-    enum class State : uint8_t { Inactive, Active };
-    struct Data {
-        int64_t dead_time_ns;
-        float duty_cycle_u;
-        float duty_cycle_v;
-        float duty_cycle_w;
-        uint32_t frequency;
-        State state;
-    };
-
     explicit ThreePhaseMotor(uint64_t deadtime_ns = 300)
         : motor_timer_(&Board::template instance_of<ktimer_motor>()),
           phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
@@ -31,7 +32,7 @@ public:
         set_dead_time(deadtime_ns);
     }
 
-    const Data& subscribe() { return data_; }
+    const ThreePhaseMotorDefs::Data& subscribe() { return data_; }
 
     template <typename T> inline void set_duty_cycle(float duty_cycle) {
         static_assert(
@@ -84,18 +85,23 @@ public:
     }
     inline void engage() {
         buffer_enable_.turn_on();
-        data_.state = State::Active;
+        data_.state = ThreePhaseMotorDefs::State::Active;
     }
     inline void disengage() {
         buffer_enable_.turn_off();
-        data_.state = State::Inactive;
+        data_.state = ThreePhaseMotorDefs::State::Inactive;
     }
     inline void stop() {
         disengage();
         set_duty_cycle(0.0f, 0.0f, 0.0f);
     }
-    inline void
-    start(float duty_u, float duty_v, float duty_w, uint32_t frequency, int64_t dead_time_ns) {
+    inline void start(
+        float duty_u,
+        float duty_v,
+        float duty_w,
+        uint32_t frequency,
+        int64_t dead_time_ns = 300
+    ) {
         setup_signals(duty_u, duty_v, duty_w, frequency, dead_time_ns);
         engage();
     }
@@ -111,7 +117,7 @@ private:
     static constexpr auto& kpinW_N = PhaseTraits<PhaseW>::pin_n;
 
     [[no_unique_address]] BufferEnable buffer_enable_{};
-    static inline Data data_{};
+    static inline ThreePhaseMotorDefs::Data data_{};
     MotorTimer motor_timer_;
     PhaseU phase_u_;
     PhaseV phase_v_;
