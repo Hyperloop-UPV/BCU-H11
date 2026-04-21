@@ -1,6 +1,5 @@
 #pragma once
 #include "BCU/Data/Data.hpp"
-#include "BCU/ThreePhaseMotor/ThreePhaseMotor.hpp"
 
 namespace BCU {
 namespace Topology {
@@ -64,7 +63,8 @@ inline constexpr auto kLED_Operational =
 inline constexpr auto kLED_Fault = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Fault);
 inline constexpr auto kLED_Connecting =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_Connecting);
-inline constexpr auto kLED_SpaceVector = ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_SpaceVector);
+inline constexpr auto kLED_SpaceVector =
+    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_SpaceVector);
 inline constexpr auto kLED_CurrentControl =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_CurrentControl);
 inline constexpr auto kLED_SpeedControl =
@@ -247,17 +247,21 @@ using HallSupply_B =
 
 using CurrentSenseA = Sensor<
     BCUBoard,
+    float,
     Types::CurrentSense_Data,
     Types::HallSupply_A,
-    Configuration::currentSense_A,
+    HardwareConf::FilterSizeCurrent,
+    HardwareConf::currentSense_A,
     Topology::kCurrentSenseU_A,
     BCU::Topology::kCurrentSenseV_A,
     Topology::kCurrentSenseW_A>;
 using CurrentSenseB = Sensor<
     BCUBoard,
+    float,
     Types::CurrentSense_Data,
     Types::HallSupply_B,
-    Configuration::currentSense_B,
+    HardwareConf::FilterSizeCurrent,
+    HardwareConf::currentSense_B,
     Topology::kCurrentSenseU_B,
     Topology::kCurrentSenseV_B,
     Topology::kCurrentSenseW_B>;
@@ -265,18 +269,22 @@ using CurrentSenseB = Sensor<
 // Voltage Sensors
 using VoltageSense = Sensor<
     BCUBoard,
+    float,
     Types::VoltageSense_Data,
     Devices::NoSupply,
-    Configuration::voltageSense,
+    HardwareConf::FilterSizeVoltage,
+    HardwareConf::voltageSense,
     Topology::kVoltageSensorA,
     Topology::kVoltageSensorB>;
 
 // Temperature Sensor
 using TempSense = Sensor<
     BCUBoard,
+    float,
     Types::TempSense_Data,
     Devices::NoSupply,
-    Configuration::tempSense,
+    HardwareConf::FilterSizeTemp,
+    HardwareConf::tempSense,
     Topology::kTempSensorA,
     Topology::kTempSensorB>;
 
@@ -288,6 +296,10 @@ using SpeetecSupply =
 using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
 using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
 
+using Speetec1 =
+    Devices::Speetec<BCUBoard, EncoderTimer1, HardwareConf::samples_speetec, SpeetecSupply>;
+using Speetec2 =
+    Devices::Speetec<BCUBoard, EncoderTimer2, HardwareConf::samples_speetec, SpeetecSupply>;
 // Inverter
 using InverterA = Devices::
     Inverter_Feedback<BCUBoard, Types::Inverter_Data, Topology::kPPUReady_A, Topology::kPPUFault_A>;
@@ -306,17 +318,27 @@ using LedOperational = decltype(Devices::DigitalOutputWrapper<
 using LedFault =
     decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_Fault>(
     ));
-using LedSpaceVector =
-    decltype(Devices::DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_SpaceVector>()
-    );
+using LedSpaceVector = decltype(Devices::DigitalOutputWrapper<
+                                BCUBoard,
+                                Devices::OLogic::N_OPEN,
+                                Topology::kLED_SpaceVector>());
 using LedCurrentControl = decltype(Devices::DigitalOutputWrapper<
+                                   BCUBoard,
+                                   Devices::OLogic::N_OPEN,
+                                   Topology::kLED_CurrentControl>());
+using LedSpeedControl = decltype(Devices::DigitalOutputWrapper<
                                  BCUBoard,
                                  Devices::OLogic::N_OPEN,
-                                 Topology::kLED_CurrentControl>());
-using LedSpeedControl =
-    decltype(Devices::
-                 DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kLED_SpeedControl>());
+                                 Topology::kLED_SpeedControl>());
 
+struct TelemetryData {
+    const Devices::ThreePhaseMotorDefs::Data& motor;
+    const VoltageSense_Data& VoltageSense;
+    const CurrentSense_Data& currentSenseA;
+    const CurrentSense_Data& currentSenseB;
+    const Devices::SpeetecDefs::Data& speetec1;
+    const Devices::SpeetecDefs::Data& speetec2;
+};
 } // namespace Types
 
 } // namespace BCU
