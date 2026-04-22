@@ -139,23 +139,23 @@ inline constexpr auto kVoltageSensorB = ST_LIB::ADCDomain::ADC(Pinout::kVoltageS
 #if defined(USE_PHY_LAN8742)
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
-    "05:80:e8:55:61:09",
-    "192.168.1.5",
+    "05:80:e8:55:61:17",
+    "192.168.1.17",
     "255.255.0.0"
 );
 #elif defined(USE_PHY_LAN8700)
 #if MASK_TO_24 == 1
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
-    "05:80:e8:55:61:09",
+    "05:80:e8:55:61:17",
     "192.168.1.5",
     "255.255.255.0"
 );
 #else
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
-    "05:80:e8:55:61:09",
-    "192.168.1.5",
+    "05:80:e8:55:51:17",
+    "192.168.1.17",
     "255.255.0.0"
 );
 #endif
@@ -163,15 +163,15 @@ inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
 #if MASK_TO_24 == 1
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H11,
-    "05:80:e8:55:61:09",
-    "192.168.1.5",
+    "05:80:e8:55:61:17",
+    "192.168.1.17",
     "255.255.255.0"
 );
 #else
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H11,
-    "05:80:e8:55:61:09",
-    "192.168.1.5",
+    "05:80:e8:55:61:17",
+    "192.168.1.17",
     "255.255.0.0"
 );
 #endif

@@ -123,12 +123,22 @@ inline constexpr auto& kHall_Supply_A = ST_LIB::PD12;
 inline constexpr auto& kHall_Supply_B = ST_LIB::PD11;
 
 // Leds
+#ifdef BOARD
 inline constexpr auto& kLED_Operational = ST_LIB::PG13;
 inline constexpr auto& kLED_Fault = ST_LIB::PG12;
 inline constexpr auto& kLED_Connecting = ST_LIB::PG11;
 inline constexpr auto& kLED_SpaceVector = ST_LIB::PG10;
 inline constexpr auto& kLED_CurrentControl = ST_LIB::PG9;
 inline constexpr auto& kLED_SpeedControl = ST_LIB::PG6;
+#endif
+#ifdef NUCLEO
+inline constexpr auto& kLED_Operational = ST_LIB::PA11;
+inline constexpr auto& kLED_Fault = ST_LIB::PA12;
+inline constexpr auto& kLED_Connecting = ST_LIB::PA9;
+inline constexpr auto& kLED_SpaceVector = ST_LIB::PA10;
+inline constexpr auto& kLED_CurrentControl = ST_LIB::PC7;
+inline constexpr auto& kLED_SpeedControl = ST_LIB::PC6;
+#endif
 
 // speetec 1
 inline constexpr auto& kSpeedtec1_IN1 = ST_LIB::PF0;
