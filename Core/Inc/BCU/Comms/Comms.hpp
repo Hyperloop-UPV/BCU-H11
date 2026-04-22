@@ -43,7 +43,7 @@ public:
             motor.duty_cycle_w,
             motor.frequency,
             motor.dead_time_ns,
-            reinterpret_cast<DataPackets::Motor_State&>(motor.state)
+            reinterpret_cast<DataPackets::Motor_State&>(motor.raw_state)
         );
         DataPackets::State_init(
             dataStateMachine.currentGeneralState,
@@ -64,13 +64,13 @@ public:
         );
         DataPackets::SPEETEC_1_init(
             Speetec1.position,
-            reinterpret_cast<DataPackets::direction_speetec&>(Speetec1.direction),
+            reinterpret_cast<DataPackets::direction_speetec&>(Speetec1.raw_direction),
             Speetec1.speed,
             Speetec1.acceleration
         );
         DataPackets::SPEETEC_2_init(
             Speetec2.position,
-            reinterpret_cast<DataPackets::direction_speetec&>(Speetec2.direction),
+            reinterpret_cast<DataPackets::direction_speetec&>(Speetec2.raw_direction),
             Speetec2.speed,
             Speetec2.acceleration
         );

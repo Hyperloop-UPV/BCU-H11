@@ -5,14 +5,17 @@
 namespace Devices {
 
 namespace ThreePhaseMotorDefs {
-enum class State : uint8_t { Inactive, Active };
+enum class State : uint8_t { Inactive = 0, Active = 1 };
 struct Data {
     int64_t dead_time_ns;
     float duty_cycle_u;
     float duty_cycle_v;
     float duty_cycle_w;
     uint32_t frequency;
-    State state;
+    union{
+        State state;
+        uint8_t raw_state;
+    };
 };
 } // namespace ThreePhaseMotorDefs
 template <
