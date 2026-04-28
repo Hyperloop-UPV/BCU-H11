@@ -12,7 +12,7 @@ struct Data {
     float duty_cycle_v;
     float duty_cycle_w;
     uint32_t frequency;
-    union{
+    union {
         State state;
         uint8_t raw_state;
     };
@@ -32,6 +32,7 @@ public:
           phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
           phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
           phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>()) {
+        turn_on_pwms();
         set_dead_time(deadtime_ns);
     }
 
@@ -110,6 +111,16 @@ public:
     }
 
 private:
+    inline void turn_off_pwms(){
+        phase_u_.turn_off();
+        phase_v_.turn_off();
+        phase_w_.turn_off();
+    }
+    inline void turn_on_pwms(){
+        phase_u_.turn_on();
+        phase_v_.turn_on();
+        phase_w_.turn_on();
+    }
     // Constant hardware
     static constexpr auto& ktimer_motor = TimerTraits<MotorTimer>::dev;
     static constexpr auto& kpinU_P = PhaseTraits<PhaseU>::pin_p;
