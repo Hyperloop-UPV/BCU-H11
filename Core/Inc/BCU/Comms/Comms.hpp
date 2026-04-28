@@ -1,5 +1,5 @@
 #pragma once
-#include "Communications/Packets/DataPackets.hpp"
+#include "Communications/Packets/DataPackets-roundrobin.hpp"
 #include "Communications/Packets/OrderPackets.hpp"
 #include "BCU/Data/Data.hpp"
 #include "BCU/MotionControl/SpaceVectorModulator.hpp"
@@ -137,6 +137,10 @@ public:
 #else
         return true;
 #endif
+    }
+    inline static void update(){
+        auto& ethernet =  BCUBoard::template instance_of<Topology::eth>();
+        ethernet.update();
     }
     inline static float duty_cycle_u_received{};
     inline static float duty_cycle_v_received{};
