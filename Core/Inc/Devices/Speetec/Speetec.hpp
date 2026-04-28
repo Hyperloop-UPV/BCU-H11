@@ -7,11 +7,10 @@ struct Data {
     double position;
     double speed;
     double acceleration;
-    union{
+    union {
         ST_LIB::Direction direction;
-        uint8_t raw_direction; 
+        uint8_t raw_direction;
     };
-   
 };
 } // namespace SpeetecDefs
 template <

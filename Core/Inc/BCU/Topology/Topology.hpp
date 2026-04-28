@@ -70,12 +70,13 @@ inline constexpr auto kLED_CurrentControl =
 inline constexpr auto kLED_SpeedControl =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kLED_SpeedControl);
 
+#ifdef H11
 // Hall sensor supply
 inline constexpr auto kHall_Supply_A =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kHall_Supply_A);
 inline constexpr auto kHall_Supply_B =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kHall_Supply_B);
-
+#endif
 // Hall Sensors
 inline constexpr auto kCurrentSenseU_A =
     ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_U_A, ST_LIB::ADCDomain::Resolution::BITS_16);
@@ -90,9 +91,6 @@ inline constexpr auto kCurrentSenseW_A =
 inline constexpr auto kCurrentSenseW_B =
     ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_B, ST_LIB::ADCDomain::Resolution::BITS_16);
 
-// Speedtec
-inline constexpr auto kSpeetecSupply =
-    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
 
 inline constexpr auto kSpeedtec1_Input1 = ST_LIB::TimerPin{
     .af = ST_LIB::TimerAF::Encoder,
@@ -104,6 +102,14 @@ inline constexpr auto kSpeedtec1_Input2 = ST_LIB::TimerPin{
     .pin = Pinout::kSpeedtec1_IN2,
     .channel = Pinout::kSpeedtec1_Channel_IN2
 };
+
+inline constexpr auto ktimer_speetec1 = ST_LIB::TimerDomain::Timer(
+    {.request = Pinout::ktimer_speetec1},
+    kSpeedtec1_Input1,
+    kSpeedtec1_Input2
+);
+
+#ifdef H11
 inline constexpr auto kSpeedtec2_Input1 = ST_LIB::TimerPin{
     .af = ST_LIB::TimerAF::Encoder,
     .pin = Pinout::kSpeedtec2_IN1,
@@ -115,17 +121,18 @@ inline constexpr auto kSpeedtec2_Input2 = ST_LIB::TimerPin{
     .channel = Pinout::kSpeedtec2_Channel_IN2
 };
 
-inline constexpr auto ktimer_speetec1 = ST_LIB::TimerDomain::Timer(
-    {.request = Pinout::ktimer_speetec1},
-    kSpeedtec1_Input1,
-    kSpeedtec1_Input2
-);
-
 inline constexpr auto ktimer_speetec2 = ST_LIB::TimerDomain::Timer(
     {.request = Pinout::ktimer_speetec2},
     kSpeedtec2_Input1,
     kSpeedtec2_Input2
 );
+// Speetec supply
+inline constexpr auto kSpeetecSupply =
+    ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
+#endif
+
+
+
 // Temperature sensors
 inline constexpr auto kTempSensorA = ST_LIB::ADCDomain::ADC(Pinout::kTempSensorA);
 inline constexpr auto kTempSensorB = ST_LIB::ADCDomain::ADC(Pinout::kTempSensorB);
@@ -140,7 +147,7 @@ inline constexpr auto kVoltageSensorB = ST_LIB::ADCDomain::ADC(Pinout::kVoltageS
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
     "05:80:e8:55:61:17",
-    "192.168.1.17",
+    "192.168.2.17",
     "255.255.0.0"
 );
 #elif defined(USE_PHY_LAN8700)
@@ -148,14 +155,14 @@ inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
     "05:80:e8:55:61:17",
-    "192.168.1.5",
-    "255.255.255.0"
+    "192.168.2.17",
+    "255.255.0.0"
 );
 #else
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H10,
     "05:80:e8:55:51:17",
-    "192.168.1.17",
+    "192.168.2.17",
     "255.255.0.0"
 );
 #endif
@@ -164,14 +171,14 @@ inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H11,
     "05:80:e8:55:61:17",
-    "192.168.1.17",
-    "255.255.255.0"
+    "192.168.2.17",
+    "255.255.0.0"
 );
 #else
 inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
     ST_LIB::EthernetDomain::PINSET_H11,
     "05:80:e8:55:61:17",
-    "192.168.1.17",
+    "192.168.2.17",
     "255.255.0.0"
 );
 #endif
@@ -195,22 +202,26 @@ using BCUBoard = ST_LIB::Board<
     Topology::kLED_SpaceVector,
     Topology::kLED_CurrentControl,
     Topology::kLED_SpeedControl,
-    Topology::kHall_Supply_A,
-    Topology::kHall_Supply_B,
     Topology::kCurrentSenseU_A,
     Topology::kCurrentSenseU_B,
     Topology::kCurrentSenseV_A,
     Topology::kCurrentSenseV_B,
     Topology::kCurrentSenseW_A,
     Topology::kCurrentSenseW_B,
-    Topology::kSpeetecSupply,
     Topology::kTempSensorA,
     Topology::kTempSensorB,
     Topology::kVoltageSensorA,
     Topology::kVoltageSensorB,
     Topology::kmotor_timer,
-    Topology::ktimer_speetec1,
-    Topology::ktimer_speetec2>;
+    Topology::ktimer_speetec1
+    #ifdef H11
+    ,
+    Topology::ktimer_speetec2,
+    Topology::kHall_Supply_A,
+    Topology::kHall_Supply_B,
+    Topology::kSpeetecSupply
+    #endif
+    >;
 namespace Types {
 // Motor
 using MotorTimer = ST_LIB::TimerWrapper<Topology::kmotor_timer>;
@@ -235,6 +246,7 @@ using SynchronousMotor = Devices::ThreePhaseMotor<
     BCU::Types::PhaseV,
     BCU::Types::PhaseW,
     BCU::Types::BufferEnable>;
+#ifdef H11
 // Current Sensor
 using HallSupply_A =
     decltype(Devices::
@@ -244,12 +256,16 @@ using HallSupply_B =
     decltype(Devices::
                  DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kHall_Supply_B>()
     );
-
+#endif
 using CurrentSenseA = Sensor<
     BCUBoard,
     float,
     Types::CurrentSense_Data,
+    #ifdef H11
     Types::HallSupply_A,
+    #else
+    Devices::NoSupply,
+    #endif
     HardwareConf::FilterSizeCurrent,
     HardwareConf::currentSense_A,
     Topology::kCurrentSenseU_A,
@@ -259,7 +275,11 @@ using CurrentSenseB = Sensor<
     BCUBoard,
     float,
     Types::CurrentSense_Data,
+    #ifdef H11
     Types::HallSupply_B,
+    #else
+    Devices::NoSupply,
+    #endif
     HardwareConf::FilterSizeCurrent,
     HardwareConf::currentSense_B,
     Topology::kCurrentSenseU_B,
@@ -289,17 +309,29 @@ using TempSense = Sensor<
     Topology::kTempSensorB>;
 
 // Encoder
+#ifdef H11
 using SpeetecSupply =
     decltype(Devices::
                  DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kSpeetecSupply>()
     );
+    using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
+    using Speetec2 = Devices::Speetec<BCUBoard, EncoderTimer2, HardwareConf::samples_speetec, SpeetecSupply>;
+#endif
 using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
-using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
 
 using Speetec1 =
-    Devices::Speetec<BCUBoard, EncoderTimer1, HardwareConf::samples_speetec, SpeetecSupply>;
-using Speetec2 =
-    Devices::Speetec<BCUBoard, EncoderTimer2, HardwareConf::samples_speetec, SpeetecSupply>;
+    Devices::Speetec<
+    BCUBoard, 
+    EncoderTimer1, 
+    HardwareConf::samples_speetec, 
+    #ifdef H11
+    SpeetecSupply
+    #else
+    Devices::NoSupply
+    #endif
+    >;
+
+
 // Inverter
 using InverterA = Devices::
     Inverter_Feedback<BCUBoard, Types::Inverter_Data, Topology::kPPUReady_A, Topology::kPPUFault_A>;
@@ -337,8 +369,11 @@ struct TelemetryData {
     const CurrentSense_Data& currentSenseA;
     const CurrentSense_Data& currentSenseB;
     const Devices::SpeetecDefs::Data& speetec1;
+    #ifdef H11
     const Devices::SpeetecDefs::Data& speetec2;
+    #endif
 };
+using Ethernet = decltype(&BCUBoard::template instance_of<Topology::eth>());
 } // namespace Types
 
 } // namespace BCU
