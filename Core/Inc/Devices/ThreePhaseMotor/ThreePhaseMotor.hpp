@@ -81,7 +81,7 @@ public:
         float duty_cycle_V,
         float duty_cycle_W,
         uint32_t frequency,
-        int64_t dead_time_ns
+        int64_t dead_time_ns = 300
     ) {
         set_dead_time(dead_time_ns);
         set_frequency(frequency);
@@ -111,12 +111,12 @@ public:
     }
 
 private:
-    inline void turn_off_pwms(){
+    inline void turn_off_pwms() {
         phase_u_.turn_off();
         phase_v_.turn_off();
         phase_w_.turn_off();
     }
-    inline void turn_on_pwms(){
+    inline void turn_on_pwms() {
         phase_u_.turn_on();
         phase_v_.turn_on();
         phase_w_.turn_on();
