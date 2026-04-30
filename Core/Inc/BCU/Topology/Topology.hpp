@@ -91,7 +91,6 @@ inline constexpr auto kCurrentSenseW_A =
 inline constexpr auto kCurrentSenseW_B =
     ST_LIB::ADCDomain::ADC(Pinout::kCurrentSense_W_B, ST_LIB::ADCDomain::Resolution::BITS_16);
 
-
 inline constexpr auto kSpeedtec1_Input1 = ST_LIB::TimerPin{
     .af = ST_LIB::TimerAF::Encoder,
     .pin = Pinout::kSpeedtec1_IN1,
@@ -130,8 +129,6 @@ inline constexpr auto ktimer_speetec2 = ST_LIB::TimerDomain::Timer(
 inline constexpr auto kSpeetecSupply =
     ST_LIB::DigitalOutputDomain::DigitalOutput(Pinout::kSpeedtecSupply);
 #endif
-
-
 
 // Temperature sensors
 inline constexpr auto kTempSensorA = ST_LIB::ADCDomain::ADC(Pinout::kTempSensorA);
@@ -214,13 +211,13 @@ using BCUBoard = ST_LIB::Board<
     Topology::kVoltageSensorB,
     Topology::kmotor_timer,
     Topology::ktimer_speetec1
-    #ifdef H11
+#ifdef H11
     ,
     Topology::ktimer_speetec2,
     Topology::kHall_Supply_A,
     Topology::kHall_Supply_B,
     Topology::kSpeetecSupply
-    #endif
+#endif
     >;
 namespace Types {
 // Motor
@@ -261,11 +258,11 @@ using CurrentSenseA = Sensor<
     BCUBoard,
     float,
     Types::CurrentSense_Data,
-    #ifdef H11
+#ifdef H11
     Types::HallSupply_A,
-    #else
+#else
     Devices::NoSupply,
-    #endif
+#endif
     HardwareConf::FilterSizeCurrent,
     HardwareConf::currentSense_A,
     Topology::kCurrentSenseU_A,
@@ -275,11 +272,11 @@ using CurrentSenseB = Sensor<
     BCUBoard,
     float,
     Types::CurrentSense_Data,
-    #ifdef H11
+#ifdef H11
     Types::HallSupply_B,
-    #else
+#else
     Devices::NoSupply,
-    #endif
+#endif
     HardwareConf::FilterSizeCurrent,
     HardwareConf::currentSense_B,
     Topology::kCurrentSenseU_B,
@@ -314,23 +311,22 @@ using SpeetecSupply =
     decltype(Devices::
                  DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kSpeetecSupply>()
     );
-    using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
-    using Speetec2 = Devices::Speetec<BCUBoard, EncoderTimer2, HardwareConf::samples_speetec, SpeetecSupply>;
+using EncoderTimer2 = ST_LIB::TimerWrapper<Topology::ktimer_speetec2>;
+using Speetec2 =
+    Devices::Speetec<BCUBoard, EncoderTimer2, HardwareConf::samples_speetec, SpeetecSupply>;
 #endif
 using EncoderTimer1 = ST_LIB::TimerWrapper<Topology::ktimer_speetec1>;
 
-using Speetec1 =
-    Devices::Speetec<
-    BCUBoard, 
-    EncoderTimer1, 
-    HardwareConf::samples_speetec, 
-    #ifdef H11
+using Speetec1 = Devices::Speetec<
+    BCUBoard,
+    EncoderTimer1,
+    HardwareConf::samples_speetec,
+#ifdef H11
     SpeetecSupply
-    #else
+#else
     Devices::NoSupply
-    #endif
+#endif
     >;
-
 
 // Inverter
 using InverterA = Devices::
@@ -369,9 +365,9 @@ struct TelemetryData {
     const CurrentSense_Data& currentSenseA;
     const CurrentSense_Data& currentSenseB;
     const Devices::SpeetecDefs::Data& speetec1;
-    #ifdef H11
+#ifdef H11
     const Devices::SpeetecDefs::Data& speetec2;
-    #endif
+#endif
 };
 using Ethernet = decltype(&BCUBoard::template instance_of<Topology::eth>());
 } // namespace Types
