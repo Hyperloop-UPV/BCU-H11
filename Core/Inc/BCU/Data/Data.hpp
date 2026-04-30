@@ -11,6 +11,7 @@ namespace BCU {
 
 namespace ControlConf {
 inline constexpr int32_t TelemetryDataAuxiliarPeriod = 500;
+inline constexpr int32_t TelemetryDataControlPeriod = 200;
 // Space Vector
 #ifdef DEBUG
 inline constexpr int32_t SpaceVectorPeriod = 1000; // microseconds
@@ -177,7 +178,7 @@ inline constexpr auto& kVoltageSensorA = ST_LIB::PF3;
 inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 
 #elif defined(H10)
-    // PWM R
+// PWM R
 inline constexpr auto& kPWM_U_P = ST_LIB::PE9;
 inline constexpr auto& kPWM_U_N = ST_LIB::PE8;
 
@@ -238,7 +239,7 @@ inline constexpr auto& kTempSensorB = ST_LIB::PF10;
 inline constexpr auto& kVoltageSensorA = ST_LIB::PF3;
 inline constexpr auto& kVoltageSensorB = ST_LIB::PF5;
 #else
-    compile_error("You must define or H10 or H11");
+compile_error("You must define or H10 or H11");
 #endif
 
 } // namespace Pinout
