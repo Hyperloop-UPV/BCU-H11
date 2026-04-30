@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
-
+message(STATUS "RUTA DEL COMPILADOR: ${CMAKE_CXX_COMPILER}")
 project(template-project LANGUAGES ASM C CXX)
 include(CTest)
 enable_testing()
 
 set(EXECUTABLE ${PROJECT_NAME}.elf)
-set(BOARD_NAME "TEST" CACHE STRING "Board key from Core/Inc/Code_generation/JSON_ADE/boards.json")
+set(BOARD_NAME "BCU" CACHE STRING "Board key from Core/Inc/Code_generation/JSON_ADE/boards.json")
 if(BOARD_NAME STREQUAL "")
   message(FATAL_ERROR "BOARD_NAME cannot be empty")
 endif()
@@ -108,7 +108,7 @@ add_custom_command(
   ${METADATA_SCRIPT}
   ${METADATA_TEMPLATE}
   ${METADATA_SOURCES}
-  COMMENT "Generating binary metadata"
+  COMMENT "Generating binary metadata" message(STATUS "RUTA DEL COMPILADOR: ${CMAKE_CXX_COMPILER}")
 )
 
 add_custom_target(generate_binary_metadata
@@ -180,7 +180,6 @@ if(CMAKE_CROSSCOMPILING)
     $<$<COMPILE_LANGUAGE:C>:-w>
 
     $<$<COMPILE_LANGUAGE:CXX>:-Wall>
-    # $<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
     $<$<COMPILE_LANGUAGE:CXX>:-Werror>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-use-cxa-atexit>
     $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
