@@ -47,9 +47,9 @@ public:
             control_time -= 1.0;
         }
         float offset = (std::max({sin_u, sin_v, sin_w}) + std::min({sin_u, sin_v, sin_w})) / 2.0f;
-        sin_u -= offset;
-        sin_v -= offset;
-        sin_w -= offset;
+        sin_u = (sin_u - offset) * 100.0f;
+        sin_v -= (sin_v - offset) * 100.0f;
+        sin_w -= (sin_w - offset) * 100.0f;
         return Types::DutyCycles{sin_u, sin_v, sin_w};
     }
     inline static void set_modulation_freq(uint32_t freq) { modulation_frequency = freq; }
@@ -61,6 +61,7 @@ private:
     inline static constexpr float MAX_IMOD = 2.0 / M_SQRT3;
     inline static constexpr float TWO_PI = 2.0 * M_PI;
     inline static constexpr float phase_shift = TWO_PI / 3.0f;
-    inline static constexpr float period_time = (static_cast<float>(ControlConf::SpaceVectorPeriod)/ 1'000'000);
+    inline static constexpr float period_time =
+        (static_cast<float>(ControlConf::SpaceVectorPeriod) / 1'000'000);
 };
 } // namespace BCU
