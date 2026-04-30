@@ -16,15 +16,7 @@ public:
         Comms::update();
         BCU_State_Machine.check_transitions();
         Operational_State_Machine.check_transitions();
-        if (OrderPackets::Configure_Commutation_Parameters_flag) {
-            OrderPackets::Configure_Commutation_Parameters_flag = false;
-            motor_->set_frequency(Comms::commutation_frequency_received);
-            motor_->set_dead_time(Comms::dead_time_ns_received);
-        }
-        if (OrderPackets::Change_angle_offset_flag) {
-            OrderPackets::Change_angle_offset_flag = false;
-            CurrentController::set_angle_offset(Comms::angle_offset_received);
-        }
+        check_orders_received();
     }
     static inline void init() {
         BCUBoard::init();
@@ -35,12 +27,16 @@ public:
         tempSense_ = std::make_unique<Types::TempSense>();
         inverterA_ = std::make_unique<Types::InverterA>();
         inverterB_ = std::make_unique<Types::InverterB>();
-        speetec1_ = std::make_unique<Types::Speetec1>(HardwareConf::counter_distance_m,
-        HardwareConf::sample_time_s);
-        #ifdef H11
-        speetec2_ = std::make_unique<Types::Speetec2>(HardwareConf::counter_distance_m,
-        HardwareConf::sample_time_s);
-        #endif
+        speetec1_ = std::make_unique<Types::Speetec1>(
+            HardwareConf::counter_distance_m,
+            HardwareConf::sample_time_s
+        );
+#ifdef H11
+        speetec2_ = std::make_unique<Types::Speetec2>(
+            HardwareConf::counter_distance_m,
+            HardwareConf::sample_time_s
+        );
+#endif
         // Link Communications
         Comms::init<
             Devices::ThreePhaseMotorDefs::Data,
@@ -54,11 +50,11 @@ public:
             telemetryData().VoltageSense,
             dataTemp(),
             telemetryData().speetec1,
-            #ifdef H11
+#ifdef H11
             telemetryData().speetec2,
-            #else 
+#else
             telemetryData().speetec1,
-            #endif
+#endif
             dataStateMachine
         );
 
@@ -67,28 +63,80 @@ public:
         currentSenseA_->turn_on();
         currentSenseB_->turn_on();
         speetec1_->turn_on();
-        #ifdef H11
+#ifdef H11
         speetec2_->turn_on();
-        #endif
+#endif
         BCU_State_Machine.start();
         Operational_State_Machine.start();
-        // Crear las Acciones ciclicas
-        Scheduler::register_task(ControlConf::TelemetryDataAuxiliarPeriod,&update_auxiliary_telemetry);
-        Scheduler::register_task(ControlConf::CurrentControlPeriod, &on_current_control);
-        Scheduler::register_task(ControlConf::SpaceVectorPeriod, &on_space_vector);
-        Scheduler::register_task(ControlConf::SpeedControlPeriod, &on_speed_control);
+        // Create cyclic actions
+        Scheduler::register_task(
+            ControlConf::TelemetryDataAuxiliarPeriod,
+            &update_auxiliary_telemetry
+        );
+        Scheduler::register_task(
+            ControlConf::TelemetryDataControlPeriod,
+            &update_control_telemetry
+        );
     }
 
 private:
+    static inline void check_orders_received() {
+
+        if (OrderPackets::Configure_Commutation_Parameters_flag) {
+            OrderPackets::Configure_Commutation_Parameters_flag = false;
+            motor_->set_frequency(Comms::commutation_frequency_received);
+            motor_->set_dead_time(Comms::dead_time_ns_received);
+        }
+        if (OrderPackets::Change_angle_offset_flag) {
+            OrderPackets::Change_angle_offset_flag = false;
+            CurrentController::set_angle_offset(Comms::angle_offset_received);
+        }
+        OperationalStates state = Operational_State_Machine.get_current_state();
+        // This will only be executed inside test PWM
+        if (OrderPackets::Start_Test_PWM_flag) {
+            OrderPackets::Start_Test_PWM_flag = false;
+            if (state == OperationalStates::Test_PWM) {
+                motor_->setup_signals(
+                    Comms::duty_cycle_u_received,
+                    Comms::duty_cycle_v_received,
+                    Comms::duty_cycle_w_received,
+                    Comms::commutation_frequency_received
+                );
+            }
+        } else if (OrderPackets::Start_Space_Vector_flag) {
+            OrderPackets::Start_Space_Vector_flag = false;
+            if (state == OperationalStates::Space_Vector) {
+                motor_->set_frequency(Comms::commutation_frequency_received);
+                SpaceVectorModulator::set_modulation_freq(Comms::modulation_frequency_received);
+                SpaceVectorModulator::set_modulation_index(
+                    Comms::voltage_reference_received,
+                    Comms::voltage_max_received
+                );
+            }
+        } else if (OrderPackets::Start_Current_Control_flag && state == OperationalStates::Current_Control) {
+            OrderPackets::Start_Current_Control_flag = false;
+            if (state == OperationalStates::Current_Control) {
+                motor_->set_frequency(Comms::commutation_frequency_received);
+                CurrentController::set_d_ref(Comms::d_current_reference_received);
+                CurrentController::set_q_ref(Comms::q_current_reference_received);
+                CurrentController::reset();
+            }
+        } else if (OrderPackets::Start_Speed_Control_flag) {
+            OrderPackets::Start_Speed_Control_flag = false;
+            if (state == OperationalStates::Speed_Control) {
+                SpeedController::set_speed_m_s(Comms::target_linear_speed_received);
+            }
+        }
+    }
     Controller() = delete;
     static inline void update_control_telemetry() {
         voltageSense_->read();
         currentSenseA_->read();
         currentSenseB_->read();
         speetec1_->read();
-        #ifdef H11
+#ifdef H11
         speetec2_->read();
-        #endif
+#endif
         // read encoder
     }
     static inline void update_auxiliary_telemetry() {
@@ -133,13 +181,12 @@ private:
     inline static std::unique_ptr<Types::InverterA> inverterA_;
     inline static std::unique_ptr<Types::InverterB> inverterB_;
     inline static std::unique_ptr<Types::Speetec1> speetec1_;
-    #ifdef H11
+#ifdef H11
     inline static std::unique_ptr<Types::Speetec2> speetec2_;
-    #endif
+#endif
     // Data
     inline static Types::StateMachineData dataStateMachine{};
 
-    
     inline static const Types::TempSense_Data& dataTemp() {
         static const Types::TempSense_Data& ref = tempSense_->subscribe();
         return ref;
@@ -159,10 +206,10 @@ private:
             .currentSenseA = currentSenseA_->subscribe(),
             .currentSenseB = currentSenseB_->subscribe(),
             .speetec1 = speetec1_->subscribe()
-            #ifdef H11
-            ,
+#ifdef H11
+                ,
             .speetec2 = speetec2_->subscribe()
-            #endif
+#endif
         };
         return data;
     }
@@ -374,6 +421,23 @@ private:
         sm.add_exit_action(&exit_CurrentControl_state, nested_CurrentControl_state);
         // Speed Control: exit action
         sm.add_exit_action(&exit_SpeedControl_state, nested_SpeedControl_state);
+
+        //-----Cyclic Actions -------//
+        sm.add_cyclic_action(
+            &on_space_vector,
+            ControlConf::SpaceVectorPeriodTime,
+            nested_SpaceVector_state
+        );
+        sm.add_cyclic_action(
+            &on_current_control,
+            ControlConf::CurrentControlPeriodTime,
+            nested_CurrentControl_state
+        );
+        sm.add_cyclic_action(
+            &on_speed_control,
+            ControlConf::SpeedControlPeriodTime,
+            nested_SpeedControl_state
+        );
         return sm;
     }();
 
