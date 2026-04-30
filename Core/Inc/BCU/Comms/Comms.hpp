@@ -133,13 +133,14 @@ public:
     }
     inline static bool is_connected() {
 #ifdef STLIB_ETH
-        return OrderPackets::control_station_tcp->is_connected();
+        auto& ethernet = BCUBoard::template instance_of<Topology::eth>();
+        return OrderPackets::control_station_tcp->is_connected() && ethernet.is_connected();
 #else
         return true;
 #endif
     }
-    inline static void update(){
-        auto& ethernet =  BCUBoard::template instance_of<Topology::eth>();
+    inline static void update() {
+        auto& ethernet = BCUBoard::template instance_of<Topology::eth>();
         ethernet.update();
     }
     inline static float duty_cycle_u_received{};
