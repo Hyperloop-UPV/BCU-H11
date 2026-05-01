@@ -1,6 +1,6 @@
 #pragma once
 #include "Communications/Packets/DataPackets-roundrobin.hpp"
-#include "Communications/Packets/OrderPackets.hpp"
+#include "Communications/Packets/NewOrderPackets.hpp"
 #include "BCU/Data/Data.hpp"
 #include "BCU/MotionControl/SpaceVectorModulator.hpp"
 #include "BCU/MotionControl/CurrentController.hpp"
