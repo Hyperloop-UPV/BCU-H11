@@ -179,31 +179,31 @@ public:
 
     static void start() {
         if (Motor_Info_packet == nullptr) {
-            ErrorHandler("Packet Motor_Info not initialized");
+            PANIC("Packet Motor_Info not initialized");
         }
         if (State_packet == nullptr) {
-            ErrorHandler("Packet State not initialized");
+            PANIC("Packet State not initialized");
         }
         if (Space_Vector_packet == nullptr) {
-            ErrorHandler("Packet Space_Vector not initialized");
+            PANIC("Packet Space_Vector not initialized");
         }
         if (DC_Link_packet == nullptr) {
-            ErrorHandler("Packet DC_Link not initialized");
+            PANIC("Packet DC_Link not initialized");
         }
         if (Motor_Currents_packet == nullptr) {
-            ErrorHandler("Packet Motor_Currents not initialized");
+            PANIC("Packet Motor_Currents not initialized");
         }
         if (SPEETEC_1_packet == nullptr) {
-            ErrorHandler("Packet SPEETEC_1 not initialized");
+            PANIC("Packet SPEETEC_1 not initialized");
         }
         if (SPEETEC_2_packet == nullptr) {
-            ErrorHandler("Packet SPEETEC_2 not initialized");
+            PANIC("Packet SPEETEC_2 not initialized");
         }
         if (Current_Control_packet == nullptr) {
-            ErrorHandler("Packet Current_Control not initialized");
+            PANIC("Packet Current_Control not initialized");
         }
         if (Speed_Control_packet == nullptr) {
-            ErrorHandler("Packet Speed_Control not initialized");
+            PANIC("Packet Speed_Control not initialized");
         }
 
         DataPackets::packets[0] = Motor_Info_packet;

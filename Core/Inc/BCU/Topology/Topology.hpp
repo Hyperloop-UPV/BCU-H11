@@ -1,6 +1,6 @@
 #pragma once
 #include "BCU/Data/Data.hpp"
-
+#include "BCU/StateMachine/StateMachine.hpp"
 namespace BCU {
 namespace Topology {
 // PWM Objects
@@ -184,7 +184,10 @@ inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
 #endif
 #endif
 } // namespace Topology
+
+using BoardPolicy = ST_LIB::FaultPolicy<StateMachine::General_State_Machine, StateMachine::enter_Fault_state>;
 using BCUBoard = ST_LIB::Board<
+    BoardPolicy,
 #ifdef STLIB_ETH
     Topology::eth,
 #endif
