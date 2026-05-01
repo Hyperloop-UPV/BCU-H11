@@ -15,7 +15,7 @@ public:
     inline static Data subscribe() {
         return Data(target_linear_speed, output_iq_ref, linear_speed_error);
     }
-    inline static float execute(Types::TelemetryData& data) {
+    inline static float execute(const Types::TelemetryData& data) {
 #if SPEETEC == 1
         linear_speed_error = abs(data.speetec1.speed - target_linear_speed);
 #elif SPEETEC == 2

@@ -4,7 +4,7 @@
 namespace BCU {
 class CurrentController {
 public:
-    static inline Types::DutyCycles execute(Types::TelemetryData& data) {
+    static inline Types::DutyCycles execute(const Types::TelemetryData& data) {
 // TODO: Integrate BOTH Speetecs
 // get information from sensors
 #if SPEETEC == 1
@@ -32,6 +32,7 @@ public:
 #else
         float dc_link = (data.VoltageSense.A + data.VoltageSense.B) / 2.0f;
 #endif
+//TODO ELIMINATE FMOD AND FLOOR
         electrical_angle =
             fmod(M_PI * (position - (2.0f * floor(position / 2.0f))) + angle_offset, 2 * M_PI);
 

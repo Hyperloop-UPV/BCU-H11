@@ -4,8 +4,8 @@
 namespace BCU{
     using GeneralStates = DataPackets::Bcu_general_state;
     using OperationalStates = DataPackets::Bcu_operational_state;
+
     class StateMachine {
-    
     private:
     
     //transitions
@@ -41,17 +41,7 @@ namespace BCU{
     static void on_current_control();
     static void on_speed_control();
 
-    public:
-    //added enter fault action public so can be called from the fault policy
-   static void enter_Fault_state();
-    static constexpr auto connecting_state = make_state(
-        GeneralStates::Connecting,
-        Transition<GeneralStates>{
-            GeneralStates::Operational,
-            &trans_to_operational }
-    );
-
-    static constexpr auto operational_state = make_state(
+     static constexpr auto operational_state = make_state(
         GeneralStates::Operational,
         Transition<GeneralStates>{
             GeneralStates::Fault,
@@ -133,6 +123,18 @@ namespace BCU{
                                       &trans_to_idle 
         }
     );
+
+    public:
+    //added enter fault action public so can be called from the fault policy
+   static void enter_Fault_state();
+    static constexpr auto connecting_state = make_state(
+        GeneralStates::Connecting,
+        Transition<GeneralStates>{
+            GeneralStates::Operational,
+            &trans_to_operational }
+    );
+
+   
     // Create Operational Machine
     static inline constinit auto Operational_State_Machine = []() consteval {
         auto sm = make_state_machine(
@@ -166,15 +168,23 @@ namespace BCU{
         sm.add_exit_action(&exit_SpeedControl_state, nested_SpeedControl_state);
 
         //-----Cyclic Actions -------//
+        //--Space Vector: cyclic action
         sm.add_cyclic_action(
             &on_space_vector,
             ControlConf::SpaceVectorPeriodTime,
             nested_SpaceVector_state
         );
+        // Current Control: cyclic action
         sm.add_cyclic_action(
             &on_current_control,
             ControlConf::CurrentControlPeriodTime,
             nested_CurrentControl_state
+        );
+        // Speed Control: cyclic action
+        sm.add_cyclic_action(
+            &on_current_control,
+            ControlConf::CurrentControlPeriodTime,
+            nested_SpeedControl_state
         );
         sm.add_cyclic_action(
             &on_speed_control,
