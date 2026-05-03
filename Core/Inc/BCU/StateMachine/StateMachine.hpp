@@ -1,14 +1,13 @@
 #pragma once
 #include "BCU/Data/Data.hpp"
 
-namespace BCU{
-    using GeneralStates = DataPackets::Bcu_general_state;
-    using OperationalStates = DataPackets::Bcu_operational_state;
+namespace BCU {
+using GeneralStates = DataPackets::Bcu_general_state;
+using OperationalStates = DataPackets::Bcu_operational_state;
 
-    class StateMachine {
-    private:
-    
-    //transitions
+class StateMachine {
+private:
+    // transitions
     static bool trans_to_operational();
     static bool trans_to_fault();
     static bool trans_to_idle();
@@ -17,36 +16,33 @@ namespace BCU{
     static bool trans_to_currentControl();
     static bool trans_to_speedControl();
 
-    //enter actions
+    // enter actions
     static void enter_Connecting_state();
     static void enter_Operational_state();
-    
+
     static void enter_idle_state();
     static void enter_TestPWM_state();
     static void enter_SpaceVector_state();
     static void enter_CurrentControl_state();
     static void enter_SpeedControl_state();
-    //exit actions
+    // exit actions
     static void exit_Connecting_state();
     static void exit_Operational_state();
-    
+
     static void exit_idle_state();
     static void exit_TestPWM_state();
     static void exit_SpaceVector_state();
     static void exit_CurrentControl_state();
     static void exit_SpeedControl_state();
-    //cyclic actions
+    // cyclic actions
     static void Connecting_cyclic_action();
     static void on_space_vector();
     static void on_current_control();
     static void on_speed_control();
 
-     static constexpr auto operational_state = make_state(
+    static constexpr auto operational_state = make_state(
         GeneralStates::Operational,
-        Transition<GeneralStates>{
-            GeneralStates::Fault,
-            &trans_to_fault
-        }
+        Transition<GeneralStates>{GeneralStates::Fault, &trans_to_fault}
     );
     static constexpr auto fault_state = make_state(GeneralStates::Fault);
 
@@ -55,53 +51,53 @@ namespace BCU{
         OperationalStates::Idle,
         Transition<OperationalStates>{// Transition to TEST_PWM
                                       OperationalStates::Test_PWM,
-                                      &trans_to_testPWM 
+                                      &trans_to_testPWM
         },
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Space_Vector,
-                                      &trans_to_spaceVector 
+                                      &trans_to_spaceVector
         },
         Transition<OperationalStates>{// Transition to Start Current Control
                                       OperationalStates::Current_Control,
-                                      &trans_to_currentControl 
+                                      &trans_to_currentControl
         },
         Transition<OperationalStates>{// Transition to Start Speed Control
                                       OperationalStates::Speed_Control,
-                                      &trans_to_speedControl 
+                                      &trans_to_speedControl
         }
     );
     static constexpr auto nested_TestPWM_state = make_state(
         OperationalStates::Test_PWM,
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Idle,
-                                      &trans_to_idle 
+                                      &trans_to_idle
         },
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Space_Vector,
-                                      &trans_to_spaceVector 
+                                      &trans_to_spaceVector
         },
         Transition<OperationalStates>{// Transition to Start Current Control
                                       OperationalStates::Current_Control,
-                                      &trans_to_currentControl 
+                                      &trans_to_currentControl
         },
         Transition<OperationalStates>{// Transition to Start Speed Control
                                       OperationalStates::Speed_Control,
-                                      &trans_to_speedControl 
+                                      &trans_to_speedControl
         }
     );
     static constexpr auto nested_SpaceVector_state = make_state(
         OperationalStates::Space_Vector,
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Idle,
-                                      &trans_to_idle 
+                                      &trans_to_idle
         },
         Transition<OperationalStates>{// Transition to Start Current Control
                                       OperationalStates::Current_Control,
-                                      &trans_to_currentControl 
+                                      &trans_to_currentControl
         },
         Transition<OperationalStates>{// Transition to Start Speed Control
                                       OperationalStates::Speed_Control,
-                                      &trans_to_speedControl 
+                                      &trans_to_speedControl
         }
     );
 
@@ -109,32 +105,29 @@ namespace BCU{
         OperationalStates::Current_Control,
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Idle,
-                                      &trans_to_idle 
+                                      &trans_to_idle
         },
         Transition<OperationalStates>{// Transition to Start Speed Control
                                       OperationalStates::Speed_Control,
-                                      &trans_to_speedControl 
+                                      &trans_to_speedControl
         }
     );
     static constexpr auto nested_SpeedControl_state = make_state(
         OperationalStates::Speed_Control,
         Transition<OperationalStates>{// Transition to Space Vector
                                       OperationalStates::Idle,
-                                      &trans_to_idle 
+                                      &trans_to_idle
         }
     );
 
-    public:
-    //added enter fault action public so can be called from the fault policy
-   static void enter_Fault_state();
+public:
+    // added enter fault action public so can be called from the fault policy
+    static void enter_Fault_state();
     static constexpr auto connecting_state = make_state(
         GeneralStates::Connecting,
-        Transition<GeneralStates>{
-            GeneralStates::Operational,
-            &trans_to_operational }
+        Transition<GeneralStates>{GeneralStates::Operational, &trans_to_operational}
     );
 
-   
     // Create Operational Machine
     static inline constinit auto Operational_State_Machine = []() consteval {
         auto sm = make_state_machine(
@@ -227,4 +220,4 @@ namespace BCU{
         return sm;
     }();
 };
-}
+} // namespace BCU

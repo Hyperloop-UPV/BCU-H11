@@ -32,7 +32,7 @@ public:
 #else
         float dc_link = (data.VoltageSense.A + data.VoltageSense.B) / 2.0f;
 #endif
-//TODO ELIMINATE FMOD AND FLOOR
+        // TODO ELIMINATE FMOD AND FLOOR
         electrical_angle =
             fmod(M_PI * (position - (2.0f * floor(position / 2.0f))) + angle_offset, 2 * M_PI);
 

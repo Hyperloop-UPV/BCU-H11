@@ -1,56 +1,50 @@
 #include "BCU/Controller/Controller.hpp"
-namespace BCU{
-    void Controller::update(){
-        Scheduler::update();
-        Comms::update();
-        StateMachine::General_State_Machine.check_transitions();
-        StateMachine::Operational_State_Machine.check_transitions();
-        check_orders_received();
-    }
-    void Controller::init(){
-        BCUBoard::init();
-        // Link Communications
-        Comms::init<
-            Devices::ThreePhaseMotorDefs::Data,
-            Types::CurrentSense_Data,
-            Types::VoltageSense_Data,
-            Types::TempSense_Data,
-            Devices::SpeetecDefs::Data>(
-            telemetryData().motor,
-            telemetryData().currentSenseA,
-            telemetryData().currentSenseB,
-            telemetryData().VoltageSense,
-            dataTemp(),
-            telemetryData().speetec1,
+namespace BCU {
+void Controller::update() {
+    Scheduler::update();
+    Comms::update();
+    StateMachine::General_State_Machine.check_transitions();
+    StateMachine::Operational_State_Machine.check_transitions();
+    check_orders_received();
+}
+void Controller::init() {
+    BCUBoard::init();
+    // Link Communications
+    Comms::init<
+        Devices::ThreePhaseMotorDefs::Data,
+        Types::CurrentSense_Data,
+        Types::VoltageSense_Data,
+        Types::TempSense_Data,
+        Devices::SpeetecDefs::Data>(
+        telemetryData().motor,
+        telemetryData().currentSenseA,
+        telemetryData().currentSenseB,
+        telemetryData().VoltageSense,
+        dataTemp(),
+        telemetryData().speetec1,
 #ifdef H11
-            telemetryData().speetec2,
+        telemetryData().speetec2,
 #else
-            telemetryData().speetec1,
+        telemetryData().speetec1,
 #endif
-            dataStateMachine
-        );
+        dataStateMachine
+    );
 
-        // turn on sensors
-        voltageSense_.turn_on();
-        currentSenseA_.turn_on();
-        currentSenseB_.turn_on();
-        speetec1_.turn_on();
+    // turn on sensors
+    voltageSense_.turn_on();
+    currentSenseA_.turn_on();
+    currentSenseB_.turn_on();
+    speetec1_.turn_on();
 #ifdef H11
-        speetec2_.turn_on();
+    speetec2_.turn_on();
 #endif
-        StateMachine::General_State_Machine.start();
-        StateMachine::Operational_State_Machine.start();
-        // Create cyclic actions
-        Scheduler::register_task(
-            ControlConf::TelemetryDataAuxiliarPeriod,
-            &update_auxiliary_telemetry
-        );
-        Scheduler::register_task(
-            ControlConf::TelemetryDataControlPeriod,
-            &update_control_telemetry
-        );
-    }
-    void Controller::check_orders_received() {
+    StateMachine::General_State_Machine.start();
+    StateMachine::Operational_State_Machine.start();
+    // Create cyclic actions
+    Scheduler::register_task(ControlConf::TelemetryDataAuxiliarPeriod, &update_auxiliary_telemetry);
+    Scheduler::register_task(ControlConf::TelemetryDataControlPeriod, &update_control_telemetry);
+}
+void Controller::check_orders_received() {
     handle_hardware_configuration_orders();
     handle_operational_mode_orders();
 }
@@ -101,8 +95,4 @@ void Controller::handle_operational_mode_orders() {
         SpeedController::set_speed_m_s(Comms::target_linear_speed_received);
     }
 }
-    }
-   
-
-    
-   
+} // namespace BCU

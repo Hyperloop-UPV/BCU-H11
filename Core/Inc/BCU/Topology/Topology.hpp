@@ -185,7 +185,8 @@ inline constexpr auto eth = ST_LIB::EthernetDomain::Ethernet(
 #endif
 } // namespace Topology
 
-using BoardPolicy = ST_LIB::FaultPolicy<StateMachine::General_State_Machine, StateMachine::enter_Fault_state>;
+using BoardPolicy =
+    ST_LIB::FaultPolicy<StateMachine::General_State_Machine, StateMachine::enter_Fault_state>;
 using BCUBoard = ST_LIB::Board<
     BoardPolicy,
 #ifdef STLIB_ETH
