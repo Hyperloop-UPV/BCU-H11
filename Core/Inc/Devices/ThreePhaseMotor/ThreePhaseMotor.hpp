@@ -32,8 +32,7 @@ public:
           phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
           phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
           phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>()) {
-        turn_on_pwms();
-        set_dead_time(deadtime_ns);
+        data_.dead_time_ns = deadtime_ns;
     }
 
     const ThreePhaseMotorDefs::Data& subscribe() { return data_; }
@@ -109,6 +108,12 @@ public:
         setup_signals(duty_u, duty_v, duty_w, frequency, dead_time_ns);
         engage();
     }
+    inline void turn_on() {
+        if (is_on)
+            return;
+        turn_on_pwms();
+        is_on = true;
+    }
 
 private:
     inline void turn_off_pwms() {
@@ -129,6 +134,7 @@ private:
     static constexpr auto& kpinV_N = PhaseTraits<PhaseV>::pin_n;
     static constexpr auto& kpinW_P = PhaseTraits<PhaseW>::pin_p;
     static constexpr auto& kpinW_N = PhaseTraits<PhaseW>::pin_n;
+    static inline bool is_on = false;
 
     [[no_unique_address]] BufferEnable buffer_enable_{};
     static inline ThreePhaseMotorDefs::Data data_{};

@@ -2,7 +2,6 @@
 #include "BCU/Topology/Topology.hpp"
 #include "BCU/Controller/Controller.hpp"
 using namespace ST_LIB;
-
 using namespace BCU;
 int main(void) {
     Controller::init();
@@ -12,7 +11,7 @@ int main(void) {
 }
 
 extern "C" void Error_Handler(void) {
-    ErrorHandler("HAL error handler triggered");
+    PANIC("HAL error handler triggered");
     while (1) {
     }
 }

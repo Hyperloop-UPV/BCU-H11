@@ -9,6 +9,7 @@ void Controller::update() {
 }
 void Controller::init() {
     BCUBoard::init();
+    FaultController::start();
     // Link Communications
     Comms::init<
         Devices::ThreePhaseMotorDefs::Data,
@@ -34,6 +35,7 @@ void Controller::init() {
     voltageSense_.turn_on();
     currentSenseA_.turn_on();
     currentSenseB_.turn_on();
+    motor_.turn_on();
     speetec1_.turn_on();
 #ifdef H11
     speetec2_.turn_on();
