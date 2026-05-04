@@ -6,6 +6,7 @@
 #include "Devices/Inverter_Feedback/Inverter_Feedback.hpp"
 #include "Devices/ThreePhaseMotor/ThreePhaseMotor.hpp"
 #include "Communications/Packets/DataPackets-roundrobin.hpp"
+#include "Communications/Packets/OrderPackets.hpp"
 #include "ST-LIB.hpp"
 namespace BCU {
 
@@ -14,9 +15,9 @@ inline constexpr int32_t TelemetryDataAuxiliarPeriod = 500;
 inline constexpr int32_t TelemetryDataControlPeriod = 200;
 // Space Vector
 #ifdef DEBUG
-inline constexpr int32_t SpaceVectorPeriod = 1000; // microseconds
+inline constexpr int32_t SpaceVectorPeriod = 100; // microseconds
 #else
-inline constexpr int32_t SpaceVectorPeriod = 200; // microseconds
+inline constexpr int32_t SpaceVectorPeriod = 100; // microseconds
 #endif
 inline constexpr auto SpaceVectorPeriodTime = us(SpaceVectorPeriod);
 // Current Control
