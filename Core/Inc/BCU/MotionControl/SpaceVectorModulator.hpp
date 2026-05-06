@@ -22,9 +22,9 @@ public:
     }
     inline static Types::DutyCycles execute() {
 #if TRIGONOMETRICS_CALC == 1
-        float sin_u = std::sin(TWO_PI * modulation_frequency * control_time);
-        float sin_v = std::sin(TWO_PI * modulation_frequency * control_time + phase_shift);
-        float sin_w = std::sin(TWO_PI * modulation_frequency * control_time - phase_shift);
+        float sin_u = std::sin(TWO_PI * modulation_frequency * control_time) * modulation_index;
+        float sin_v = std::sin(TWO_PI * modulation_frequency * control_time - phase_shift) * modulation_index;
+        float sin_w = std::sin(TWO_PI * modulation_frequency * control_time + phase_shift) * modulation_index;
 #elif TRIGONOMETRICS_CALC == 2
         int angle, sin_q31;
         angle = RotationComputer::radian_f32_to_q31(TWO_PI * modulation_frequency * control_time);
@@ -48,8 +48,8 @@ public:
         }
         float offset = (std::max({sin_u, sin_v, sin_w}) + std::min({sin_u, sin_v, sin_w})) / 2.0f;
         sin_u = (sin_u - offset) * 100.0f;
-        sin_v -= (sin_v - offset) * 100.0f;
-        sin_w -= (sin_w - offset) * 100.0f;
+        sin_v = (sin_v - offset) * 100.0f;
+        sin_w = (sin_w - offset) * 100.0f;
         return Types::DutyCycles{sin_u, sin_v, sin_w};
     }
     inline static void set_modulation_freq(uint32_t freq) { modulation_frequency = freq; }

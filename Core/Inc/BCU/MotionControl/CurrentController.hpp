@@ -57,9 +57,9 @@ public:
         target.w = w_ref - offset;
         // positive between 0.0-100.0
         return Types::DutyCycles(
-            100.0f * (u_ref / dc_link + 1.0f) / 2.0f,
-            100.0f * (v_ref / dc_link + 1.0f) / 2.0f,
-            100.0f * (w_ref / dc_link + 1.0f) / 2.0f
+            100.0f * (target.u / dc_link + 1.0f) / 2.0f,
+            100.0f * (target.v / dc_link + 1.0f) / 2.0f,
+            100.0f * (target.w / dc_link + 1.0f) / 2.0f
         );
     }
     static inline void reset() {
