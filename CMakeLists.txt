@@ -171,6 +171,7 @@ if(CMAKE_CROSSCOMPILING)
     $<$<BOOL:${CMAKE_CROSSCOMPILING}>:-specs=nosys.specs>
     $<$<CONFIG:Debug>:-g>
     $<$<CONFIG:RelWithDebInfo>:-g>
+    $<$<NOT:$<CONFIG:Debug>>:-flto>
     -ffunction-sections
     -fdata-sections
     -fno-exceptions
@@ -201,6 +202,7 @@ if(CMAKE_CROSSCOMPILING)
     $<$<BOOL:${CMAKE_CROSSCOMPILING}>:-lnosys>
     $<$<BOOL:${CMAKE_CROSSCOMPILING}>:-Wl,-Map=${PROJECT_NAME}.map,--cref>
     $<$<BOOL:${CMAKE_CROSSCOMPILING}>:-Wl,--gc-sections>
+    $<$<NOT:$<CONFIG:Debug>>:-flto>
   )
 
   add_dependencies(${EXECUTABLE} run_generator generate_binary_metadata)
