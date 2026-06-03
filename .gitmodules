@@ -7,3 +7,6 @@
 [submodule "generated_code"]
 	path = generated_code
 	url = https://github.com/Hyperloop-UPV/CurrentControl_Booster.git
+[submodule "Matlab_Code_Generation/CurrentControl"]
+	path = Matlab_Code_Generation/CurrentControl
+	url = https://github.com/Hyperloop-UPV/CurrentControl_Booster.git
