@@ -4,3 +4,6 @@
 [submodule "Core/Inc/Communications/JSON_ADE"]
 	path = Core/Inc/Code_generation/JSON_ADE
 	url = https://github.com/HyperloopUPV-H8/adj
+[submodule "generated_code"]
+	path = generated_code
+	url = https://github.com/Hyperloop-UPV/CurrentControl_Booster.git
