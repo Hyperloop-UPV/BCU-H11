@@ -10,3 +10,6 @@
 [submodule "Matlab_Code_Generation/CurrentControl"]
 	path = Matlab_Code_Generation/CurrentControl
 	url = https://github.com/Hyperloop-UPV/CurrentControl_Booster.git
+[submodule "Matlab_Code_Generation/SpeedControl"]
+	path = Matlab_Code_Generation/SpeedControl
+	url = https://github.com/Hyperloop-UPV/SpeedControl_Booster.git
