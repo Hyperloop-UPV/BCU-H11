@@ -10,6 +10,7 @@
 namespace BCU {
 
 namespace ControlConf {
+inline constexpr float fixed_dc_link = 400.0f; // in volts, used if DCLINK == 4
 inline constexpr int32_t TelemetryDataAuxiliarPeriod = 500;
 inline constexpr int32_t TelemetryDataControlPeriod = 200;
 // Space Vector
