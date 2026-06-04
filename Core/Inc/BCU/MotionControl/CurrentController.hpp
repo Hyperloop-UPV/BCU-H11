@@ -1,16 +1,19 @@
 #pragma once
 #include "BCU/Topology/Topology.hpp"
 
+#if USE_MATLAB_FOC_CURRENT == 1
+#include "BCU/FOC_MATLAB/Current_Controller.h"
+#endif
 namespace BCU {
+
 class CurrentController {
 public:
     static inline Types::DutyCycles execute(const Types::TelemetryData& data) {
-// TODO: Integrate BOTH Speetecs
 // get information from sensors
 #if SPEETEC == 1
-        float position = static_cast<float>(data.speetec1.position) / ControlConf::polar_pitch;
+        float position = static_cast<float>(data.speetec1.position);
 #elif SPEETEC == 2
-        float position = static_cast<float>(data.speetec1.position) / ControlConf::polar_pitch;
+        float position = static_cast<float>(data.speetec2.position);
 #endif
 #if INVERTER == 1
         float u_current = data.currentSenseA.U;
@@ -25,13 +28,37 @@ public:
         float v_current = (data.currentSenseAV + data.currentSenseB_V) / 2.0f;
         float w_current = (data.currentSenseAW + data.currentSenseBW) / 2.0f;
 #endif
-#if DCLINK == 1
+#if DCLINK == 1 // Use VoltageSense A
         float dc_link = data.VoltageSense.A;
-#elif DCLINK == 2
+#elif DCLINK == 2 // Use VoltageSense B
         float dc_link = data.VoltageSense.B;
-#else
+#elif DCLINK == 3 // Use average of VoltageSense A and B
         float dc_link = (data.VoltageSense.A + data.VoltageSense.B) / 2.0f;
+#elif DCLINK == 4 // Use fixed value
+        float dc_link = ControlConf::fixed_dc_link;
 #endif
+//Execute Control FOC
+#if USE_MATLAB_FOC_CURRENT == 1
+        Matlab_Control.step(
+            u_current,
+            v_current,
+            w_current,
+            reference.q,
+            angle_offset,
+            position,
+            target.u,
+            target.v,
+            target.w,
+            electrical_angle,
+             output.q,
+             output.d,
+             error.q,
+             error.d,
+             measured.q,
+             measured.d
+        );
+#else
+        position = position / ControlConf::polar_pitch; // convert to linear electrical angle
         // TODO ELIMINATE FMOD AND FLOOR
         electrical_angle =
             fmod(M_PI * (position - (2.0f * floor(position / 2.0f))) + angle_offset, 2 * M_PI);
@@ -55,18 +82,27 @@ public:
         target.u = u_ref - offset;
         target.v = v_ref - offset;
         target.w = w_ref - offset;
-        // positive between 0.0-100.0
+        // positive between 0.0-100.0 
+#endif
         return Types::DutyCycles(
             100.0f * (target.u / dc_link + 1.0f) / 2.0f,
             100.0f * (target.v / dc_link + 1.0f) / 2.0f,
             100.0f * (target.w / dc_link + 1.0f) / 2.0f
         );
+   
     }
     static inline void reset() {
-        d_current_control.reset();
-        q_current_control.reset();
-        output.d = 0.0f;
-        output.q = 0.0f;
+        #if USE_MATLAB_FOC_CURRENT == 1
+            Matlab_Control.rtDW.Integrator_DSTATE = 0.0f;
+            Matlab_Control.rtDW.Integrator_DSTATE_i = 0.0f;
+            output.d = 0.0f;
+            output.q = 0.0f;
+        #elif
+            d_current_control.reset();
+            q_current_control.reset();
+            output.d = 0.0f;
+            output.q = 0.0f;
+        #endif
     }
     static inline void set_angle_offset(float angle) { angle_offset = angle; }
     static inline void set_d_ref(float d_ref) { reference.d = d_ref; }
@@ -155,13 +191,16 @@ private:
     inline static Output output{};
     inline static Measured measured{};
     inline static Types::DutyCycles target;
-    inline static float cos_tetha{0.0f};
-    inline static float sin_tetha{0.0f};
+ 
     inline static float electrical_angle{0.0f};
     inline static float angle_offset{0.0f};
     inline static float offset{0.0f};
     static constexpr float CLARKE_BETA_COEFF = 1.0f / M_SQRT3;
-
+    inline static float cos_tetha{0.0f};
+    inline static float sin_tetha{0.0f};
+    #if USE_MATLAB_FOC_CURRENT == 1
+    inline static MATLAB::CurrentControl Matlab_Control{};
+    #endif
 public:
     struct Data {
         Reference& reference;
@@ -188,3 +227,5 @@ public:
     }
 };
 } // namespace BCU
+
+ 
