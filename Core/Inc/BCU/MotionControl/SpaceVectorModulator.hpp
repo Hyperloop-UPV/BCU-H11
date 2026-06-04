@@ -23,8 +23,10 @@ public:
     inline static Types::DutyCycles execute() {
 #if TRIGONOMETRICS_CALC == 1
         float sin_u = std::sin(TWO_PI * modulation_frequency * control_time) * modulation_index;
-        float sin_v = std::sin(TWO_PI * modulation_frequency * control_time - phase_shift) * modulation_index;
-        float sin_w = std::sin(TWO_PI * modulation_frequency * control_time + phase_shift) * modulation_index;
+        float sin_v =
+            std::sin(TWO_PI * modulation_frequency * control_time - phase_shift) * modulation_index;
+        float sin_w =
+            std::sin(TWO_PI * modulation_frequency * control_time + phase_shift) * modulation_index;
 #elif TRIGONOMETRICS_CALC == 2
         int angle, sin_q31;
         angle = RotationComputer::radian_f32_to_q31(TWO_PI * modulation_frequency * control_time);

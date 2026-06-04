@@ -5,8 +5,8 @@
 #define TRIGONOMETRICS_CALC 1 // 1 => Trigonometrics from std / 2 = Cordic / 3 = LUT
 #define SPEETEC 1             // 1 = Use Speetec 1 / 2 = Use Speetec 2 / 3 = Mix
 
-#define USE_MATLAB_FOC_SPEED 1        // 1 = Use MATLAB FOC / 0 = Use custom FOC
-#define USE_MATLAB_FOC_CURRENT 1      // 1 = Use MATLAB FOC / 0 = Use custom FOC
+#define USE_MATLAB_FOC_SPEED 1   // 1 = Use MATLAB FOC / 0 = Use custom FOC
+#define USE_MATLAB_FOC_CURRENT 1 // 1 = Use MATLAB FOC / 0 = Use custom FOC
 // Check the ethernet PHY and define the board version accordingly.
 
 #if defined(USE_PHY_KSZ8041)

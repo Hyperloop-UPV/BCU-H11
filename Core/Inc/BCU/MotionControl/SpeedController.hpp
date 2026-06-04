@@ -18,16 +18,15 @@ public:
         return Data(target_linear_speed, output_iq_ref, linear_speed_error);
     }
     inline static float execute(const Types::TelemetryData& data) {
-//Read speed from speetec
+// Read speed from speetec
 #if SPEETEC == 1
         float speed = data.speetec1.speed;
 #elif SPEETEC == 2
         speed = data.speetec2.speed;
 #endif
 
-
 #if USE_MATLAB_FOC_SPEED == 1
-        output_iq_ref = Matlab_Control.step(target_linear_speed,speed,linear_speed_error);
+        output_iq_ref = Matlab_Control.step(target_linear_speed, speed, linear_speed_error);
 #elif
         linear_speed_error = abs(speed - target_linear_speed);
         speed_control.input(linear_speed_error);
@@ -37,11 +36,11 @@ public:
         return output_iq_ref;
     }
     inline static void reset() {
-        #if USE_MATLAB_FOC_SPEED == 1
-            Matlab_Control.SpeedController_DW.speed_integrator_state = 0.0f;
-        #elif
+#if USE_MATLAB_FOC_SPEED == 1
+        Matlab_Control.SpeedController_DW.speed_integrator_state = 0.0f;
+#elif
         speed_control.reset();
-        #endif
+#endif
         linear_speed_error = 0.0f;
     }
     inline static void set_speed_m_s(float speed) { target_linear_speed = speed; }
@@ -56,8 +55,8 @@ private:
     inline static float linear_speed_error{0.0f};
     inline static float saturated_pi_output{0.0f};
     inline static float output_iq_ref;
-    #if USE_MATLAB_FOC_SPEED == 1
+#if USE_MATLAB_FOC_SPEED == 1
     inline static MATLAB::SpeedControl Matlab_Control{};
-    #endif
+#endif
 };
 } // namespace BCU
