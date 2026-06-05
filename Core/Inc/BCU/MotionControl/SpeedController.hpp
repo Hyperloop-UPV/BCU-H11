@@ -24,7 +24,11 @@ public:
 #elif SPEETEC == 2
         speed = data.speetec2.speed;
 #endif
-
+        // If speed is very low, The speetec is not working so we return 0.0f to avoid noise in the
+        // control loop
+        if (speed < 0.01f) {
+            return 0.0f;
+        }
 #if USE_MATLAB_FOC_SPEED == 1
         output_iq_ref = Matlab_Control.step(target_linear_speed, speed, linear_speed_error);
 #elif

@@ -12,9 +12,16 @@ public:
 // get information from sensors
 #if SPEETEC == 1
         float position = static_cast<float>(data.speetec1.position);
+        float speed = static_cast<float>(data.speetec1.speed);
 #elif SPEETEC == 2
         float position = static_cast<float>(data.speetec2.position);
+        float speed = static_cast<float>(data.speetec2.speed);
 #endif
+        // if speed is very low, The speetec is not working so we return 0.0f to avoid noise in the
+        // control loop
+        if (speed < 0.01f) {
+            return Types::DutyCycles(0.0f, 0.0f, 0.0f);
+        }
 #if INVERTER == 1
         float u_current = data.currentSenseA.U;
         float v_current = data.currentSenseA.V;
