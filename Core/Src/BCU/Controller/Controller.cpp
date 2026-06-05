@@ -45,6 +45,7 @@ void Controller::init() {
     // Create cyclic actions
     Scheduler::register_task(ControlConf::TelemetryDataAuxiliarPeriod, &update_auxiliary_telemetry);
     Scheduler::register_task(ControlConf::TelemetryDataControlPeriod, &update_control_telemetry);
+    Scheduler::register_task(ControlConf::TelemetryDataPositionPeriod, &update_position_telemetry);
 }
 void Controller::check_orders_received() {
     handle_hardware_configuration_orders();

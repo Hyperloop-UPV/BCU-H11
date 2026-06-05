@@ -12,7 +12,8 @@ namespace BCU {
 namespace ControlConf {
 inline constexpr float fixed_dc_link = 400.0f; // in volts, used if DCLINK == 4
 inline constexpr int32_t TelemetryDataAuxiliarPeriod = 500;
-inline constexpr int32_t TelemetryDataControlPeriod = 200;
+inline constexpr int32_t TelemetryDataControlPeriod = 100;
+inline constexpr int32_t TelemetryDataPositionPeriod = 50;
 // Space Vector
 #ifdef DEBUG
 inline constexpr int32_t SpaceVectorPeriod = 1000; // microseconds
@@ -62,7 +63,7 @@ inline constexpr size_t FilterSizeTemp = 1;
 // number samples speetec
 inline constexpr size_t samples_speetec = 10;
 inline constexpr double counter_distance_m = 0.0001;
-inline constexpr double sample_time_s = 200.0 / 1e6;
+inline constexpr double sample_time_s = ControlConf::TelemetryDataPositionPeriod / 1e6;
 
 inline constexpr SensorConfig::Config currentSense_U_A{1.0f, 0.0f};
 inline constexpr SensorConfig::Config currentSense_V_A{1.0f, 0.0f};

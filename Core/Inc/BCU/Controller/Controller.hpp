@@ -89,10 +89,12 @@ private:
         voltageSense_.read();
         currentSenseA_.read();
         currentSenseB_.read();
+    }
+    inline static void update_position_telemetry(){
         speetec1_.read();
-#ifdef H11
+        #ifdef H11
         speetec2_.read();
-#endif
+        #endif
     }
     inline static void update_auxiliary_telemetry() {
         inverterA_.read();
