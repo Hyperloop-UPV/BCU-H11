@@ -237,7 +237,7 @@ using PhaseW =
                  .template get_dual_pwm<Topology::kMotorPhaseW_P, Topology::kMotorPhaseW_N>());
 using BufferEnable =
     decltype(Devices::
-                 DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_OPEN, Topology::kBufferEnable>()
+                 DigitalOutputWrapper<BCUBoard, Devices::OLogic::N_CLOSE, Topology::kBufferEnable>()
     );
 
 using SynchronousMotor = Devices::ThreePhaseMotor<

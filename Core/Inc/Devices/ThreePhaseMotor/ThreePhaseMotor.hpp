@@ -31,8 +31,10 @@ public:
         : motor_timer_(&Board::template instance_of<ktimer_motor>()),
           phase_u_(motor_timer_.template get_dual_pwm<kpinU_P, kpinU_N>()),
           phase_v_(motor_timer_.template get_dual_pwm<kpinV_P, kpinV_N>()),
-          phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>()),
-          data_dead_time_ns(deadtime_ns) {}
+          phase_w_(motor_timer_.template get_dual_pwm<kpinW_P, kpinW_N>())
+          {
+            data_.dead_time_ns = deadtime_ns;
+          }
 
     const ThreePhaseMotorDefs::Data& subscribe() { return data_; }
 
